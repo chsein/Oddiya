@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ODDIYA - 여행 기록 앱</title>
+    <meta name="description" content="나만의 여행을 기록하고 공유하는 앱">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#00FFAA">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="ODDIYA">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ODDIYA">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-config" content="/icons/browserconfig.xml">
+    <meta name="msapplication-TileColor" content="#00FFAA">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="theme-color" content="#00FFAA">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Galada:wght@400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower:wght@400&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #CEF8DE;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .description {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .install-button {
+            background: linear-gradient(135deg, #00FFAA, #00e699);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 255, 170, 0.3);
+        }
+
+        .install-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 170, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo">ODDIYA</div>
+        <div class="description">나만의 여행을 기록하고 공유하는 앱</div>
+        <button class="install-button" onclick="installPWA()">앱 설치하기</button>
+    </div>
+
+    <script>
+        let deferredPrompt;
+
+        // PWA 설치 프롬프트 이벤트 리스너
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('PWA 설치 프롬프트 준비됨');
+        });
+
+        // PWA 설치 함수
+        async function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('PWA 설치 결과:', outcome);
+                deferredPrompt = null;
+            } else {
+                alert('PWA 설치가 지원되지 않습니다. Chrome, Edge, Safari에서 시도해보세요.');
+            }
+        }
+
+        // PWA 설치 완료 이벤트
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA가 설치되었습니다!');
+            alert('PWA가 성공적으로 설치되었습니다!');
+        });
+    </script>
+</body>
+
+</html>

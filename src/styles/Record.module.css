@@ -1,0 +1,390 @@
+/* Record 페이지 스타일 - scheduleConfirmation과 동일한 색상 테마 */
+.container {
+    min-height: 100vh;
+    background: #CEF4F7;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.content {
+    flex: 1;
+    padding: 30px;
+    height: calc(100vh - 80px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 컨트롤 패널 스타일 */
+.controlPanel {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.addPhotoButton {
+    background: linear-gradient(135deg, #ffffff 50%, #00EEFF 100%);
+    border: 2px solid #333;
+    border-radius: 15px;
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.addPhotoButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    border-color: #00EEFF;
+}
+
+.addPhotoButton:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.addPhotoButton:disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.addPhotoButton:disabled:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-color: #333;
+}
+
+/* 저장 공간 정보 */
+.storageInfo {
+    font-size: 0.9rem;
+    color: #666;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-weight: 500;
+}
+
+/* 빈 상태 스타일 */
+.emptyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    flex: 1;
+}
+
+.emptyIcon {
+    font-size: 5rem;
+    margin-bottom: 30px;
+    opacity: 0.7;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.emptyTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 15px 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.emptyDescription {
+    font-size: 1.2rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.6;
+    max-width: 400px;
+}
+
+/* 사진 갤러리 스타일 */
+.photoGallery {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 20px 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+    flex: 1;
+    /* 스크롤 동작 개선 */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    /* 스크롤 영역 확장 */
+    padding-left: 0;
+    padding-right: 20px;
+}
+
+.photoGallery::-webkit-scrollbar {
+    height: 8px;
+}
+
+.photoGallery::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.photoGallery::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.photoGallery::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.photoCard {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid #333;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+    width: 200px;
+    min-width: 200px;
+    height: 250px;
+}
+
+.photoCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    border-color: #00EEFF;
+}
+
+.photoImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
+}
+
+.photoOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 18px;
+}
+
+.photoCard:hover .photoOverlay {
+    opacity: 1;
+}
+
+
+.deleteButton {
+    background: #ff4757;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+.deleteButton:hover {
+    background: #ff3742;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(255, 71, 87, 0.4);
+}
+
+/* 로딩 오버레이 */
+.loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(206, 244, 247, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.loadingSpinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #00EEFF;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loadingOverlay p {
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .content {
+        padding: 20px;
+    }
+
+    .controlPanel {
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .storageInfo {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    .addPhotoButton {
+        padding: 10px 20px;
+        font-size: 1.1rem;
+    }
+
+    .emptyTitle {
+        font-size: 1.6rem;
+    }
+
+    .emptyDescription {
+        font-size: 1rem;
+    }
+
+    .photoCard {
+        width: 160px;
+        min-width: 160px;
+        height: 200px;
+    }
+
+
+    .emptyIcon {
+        font-size: 4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 15px;
+    }
+
+    .controlPanel {
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .storageInfo {
+        font-size: 0.75rem;
+        padding: 5px 8px;
+    }
+
+    .addPhotoButton {
+        padding: 8px 16px;
+        font-size: 1rem;
+    }
+
+    .photoCard {
+        width: 140px;
+        min-width: 140px;
+        height: 180px;
+    }
+
+
+    .emptyTitle {
+        font-size: 1.4rem;
+    }
+
+    .emptyDescription {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .content {
+        padding: 15px;
+    }
+
+    .controlPanel {
+        gap: 8px;
+        margin-bottom: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .storageInfo {
+        font-size: 0.7rem;
+        padding: 4px 6px;
+    }
+
+    .addPhotoButton {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+
+    .photoCard {
+        width: 120px;
+        min-width: 120px;
+        height: 150px;
+    }
+
+
+    .emptyContainer {
+        padding: 30px 20px;
+    }
+
+    .emptyIcon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+
+    .emptyTitle {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+    }
+
+    .emptyDescription {
+        font-size: 0.9rem;
+    }
+}

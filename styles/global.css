@@ -11,7 +11,7 @@
   --geist-quarter-pad: 6px;
   --geist-half-pad: 12px;
   --geist-pad: 24px;
-  --geist-font: "Inter";
+  --geist-font: "Gamja Flower", "Gaegu", "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   --geist-error: #e00;
 
@@ -36,13 +36,21 @@
     --geist-error: red;
     --subtitle: #8d8d8d;
   }
+
   .cinematics {
     box-shadow: 0 0 200px rgba(255, 255, 255, 0.15);
   }
 }
 
+html,
+body {
+  overflow-y: hidden;
+  height: 100%;
+}
+
 body {
   background-color: var(--background);
+  font-family: var(--geist-font);
 }
 
 input {

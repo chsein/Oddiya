@@ -1,0 +1,205 @@
+.header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    border-radius: 0 0 20px 20px;
+}
+
+.headerContent {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: auto auto 1fr auto auto;
+    align-items: center;
+    height: 70px;
+    gap: 15px;
+}
+
+.logo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.logo h1 {
+    font-size: clamp(0.8rem, 4vw, 2.2rem);
+    font-weight: 400;
+    color: #333;
+    margin: 0;
+    letter-spacing: 0.1em;
+    font-family: 'Gamja Flower', cursive;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    transition: font-size 0.3s ease;
+    min-width: 0;
+    word-break: keep-all;
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 2px 0 0 0;
+    font-weight: 400;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.leftIcons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+.rightIcons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+    font-size: 1.3rem;
+
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.icon:hover {
+    background: rgba(255, 255, 255, 0.5);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.1);
+}
+
+.headerButtons {
+    display: flex;
+    gap: 10px;
+    padding: 15px 20px;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.headerButton {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.headerButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+
+
+.leftButtonContainer {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.rightButtonContainer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sideButton {
+    background: rgba(255, 255, 255, 0.2);
+    color: #333;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 16px;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.sideButton:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+}
+
+
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .headerContent {
+        padding: 0 15px;
+        height: 60px;
+        gap: 10px;
+        grid-template-columns: auto auto 1fr auto auto;
+    }
+
+    .logo h1 {
+        font-size: clamp(0.7rem, 3.5vw, 1.8rem);
+        min-width: 0;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+    }
+
+    .sideButton {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .headerContent {
+        padding: 0 10px;
+        gap: 8px;
+        grid-template-columns: auto auto 1fr auto auto;
+    }
+
+    .logo h1 {
+        font-size: clamp(0.6rem, 3vw, 1.6rem);
+        min-width: 0;
+    }
+
+    .subtitle {
+        font-size: 0.75rem;
+    }
+
+    .sideButton {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+    }
+
+    .icon {
+        width: 25px;
+        height: 25px;
+        font-size: 1rem;
+    }
+}

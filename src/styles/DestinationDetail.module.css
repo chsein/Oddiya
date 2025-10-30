@@ -1,0 +1,194 @@
+/* DestinationDetail 페이지 스타일 */
+.container {
+    min-height: 100vh;
+    background: #FFF9C4;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.content {
+    padding: 20px;
+    min-height: calc(100vh - 70px);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.address {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.mainContent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+    align-items: start;
+}
+
+.imageSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mainImage {
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid #333;
+}
+
+.emoji {
+    font-size: 6rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.textSection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.description {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+    text-align: left;
+    white-space: pre-line;
+}
+
+.featuresGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.featureCard {
+    background: #FFE135;
+    border: 2px solid #333;
+    border-radius: 15px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.featureIcon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.featureText {
+    font-size: 1rem;
+    color: #333;
+    font-weight: 500;
+    white-space: pre-line;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .content {
+        padding: 15px;
+    }
+
+    .mainContent {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .mainImage {
+        height: 250px;
+        max-width: 100%;
+    }
+
+    .emoji {
+        font-size: 4rem;
+    }
+
+    .description {
+        font-size: 1rem;
+    }
+
+    .featuresGrid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+    }
+
+    .featureCard {
+        padding: 12px;
+    }
+
+    .featureIcon {
+        font-size: 1.3rem;
+    }
+
+    .featureText {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 12px;
+    }
+
+    .address {
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+
+    .mainContent {
+        gap: 15px;
+    }
+
+    .mainImage {
+        height: 200px;
+    }
+
+    .emoji {
+        font-size: 3.5rem;
+    }
+
+    .description {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .featuresGrid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .featureCard {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .featureIcon {
+        font-size: 1.2rem;
+    }
+
+    .featureText {
+        font-size: 0.85rem;
+    }
+}

@@ -1,0 +1,332 @@
+.container {
+    min-height: 100vh;
+    background: #CEF8DE;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.content {
+    padding: 20px;
+    min-height: calc(100vh - 70px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+}
+
+
+/* 로딩 상태 */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #666;
+}
+
+.loadingSpinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #00FFAA;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 에러 상태 */
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #e74c3c;
+    text-align: center;
+}
+
+.retryButton {
+    margin-top: 16px;
+    padding: 10px 20px;
+    background: #00FFAA;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.retryButton:hover {
+    background: #00e699;
+    transform: translateY(-2px);
+}
+
+
+/* 빈 상태 (여행이 0개일 때) */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    background: #CEF8DE;
+    min-height: 400px;
+    width: 100%;
+}
+
+.emptyIcon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.emptyTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 10px 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.emptyDescription {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0 0 30px 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.addTripButton {
+    background: linear-gradient(135deg, #00FFAA, #00e699);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 255, 170, 0.3);
+}
+
+.addTripButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 255, 170, 0.4);
+    background: linear-gradient(135deg, #00e699, #00d68a);
+}
+
+
+
+.tripGrid {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 20px;
+    padding: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: #00FFAA #f0f0f0;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tripGrid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tripGrid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.tripGrid::-webkit-scrollbar-thumb {
+    background: #00FFAA;
+    border-radius: 4px;
+}
+
+.tripGrid::-webkit-scrollbar-thumb:hover {
+    background: #00e699;
+}
+
+.tripCard {
+    flex-shrink: 0;
+    width: 230px;
+    height: 230px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.tripCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.cardImage {
+    flex: 1;
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.emoji {
+    font-size: 3rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.cardContent {
+    padding: 15px;
+    background: white;
+}
+
+.cardTitle {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 8px 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.cardDate {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0 0 4px 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.cardDateRange {
+    font-size: 0.9rem;
+    color: #999;
+    margin: 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .content {
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tripGrid {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .emoji {
+        font-size: 2.5rem;
+    }
+
+    .cardTitle {
+        font-size: 1.2rem;
+    }
+
+    .cardDate {
+        font-size: 1rem;
+    }
+
+    .cardDateRange {
+        font-size: 0.8rem;
+    }
+
+    .emptyState {
+        padding: 40px 15px;
+    }
+
+    .emptyIcon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+
+    .emptyTitle {
+        font-size: 1.3rem;
+    }
+
+    .emptyDescription {
+        font-size: 1rem;
+        margin-bottom: 25px;
+    }
+
+    .addTripButton {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .tripGrid {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .emoji {
+        font-size: 2rem;
+    }
+
+    .cardContent {
+        padding: 12px;
+    }
+
+    .cardTitle {
+        font-size: 1.1rem;
+    }
+
+    .cardDate {
+        font-size: 0.9rem;
+    }
+
+    .cardDateRange {
+        font-size: 0.7rem;
+    }
+
+    .emptyState {
+        padding: 30px 10px;
+    }
+
+    .emptyIcon {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+    }
+
+    .emptyTitle {
+        font-size: 1.2rem;
+    }
+
+    .emptyDescription {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    .addTripButton {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+}

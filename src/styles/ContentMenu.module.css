@@ -1,0 +1,336 @@
+/* ContentMenu 페이지 스타일 */
+.container {
+    min-height: 100vh;
+    background: #CEF8DE;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.content {
+    padding: 20px;
+    min-height: calc(100vh - 70px);
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #e74c3c;
+    text-align: center;
+}
+
+.retryButton {
+    margin-top: 16px;
+    padding: 10px 20px;
+    background: #00FFAA;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.retryButton:hover {
+    background: #00e699;
+    transform: translateY(-2px);
+}
+
+.tripHeader {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.tripImage {
+    width: 120px;
+    height: 160px;
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.emoji {
+    font-size: 4rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.tripInfo {
+    flex: 1;
+}
+
+.tripTitle {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 10px 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.tripDate {
+    font-size: 1.3rem;
+    color: #666;
+    margin: 0 0 15px 0;
+    font-weight: 500;
+}
+
+.tripDescription {
+    font-size: 1.2rem;
+    color: #888;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.menuGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.menuItem {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid #333;
+}
+
+.menuItem:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    border-color: #00FFAA;
+}
+
+.menuIcon {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.menuTitle {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 10px 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.menuDescription {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* 가로모드 (landscape) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .content {
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .tripHeader {
+        flex-direction: row;
+        text-align: left;
+        padding: 15px;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .tripImage {
+        width: 60px;
+        height: 60px;
+    }
+
+    .emoji {
+        font-size: 2rem;
+    }
+
+    .tripTitle {
+        font-size: 1.4rem;
+    }
+
+    .tripDate {
+        font-size: 0.9rem;
+    }
+
+    .tripDescription {
+        font-size: 0.8rem;
+    }
+
+    .menuGrid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        align-items: center;
+        width: 90%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .menuItem {
+        padding: 12px;
+        min-height: 80px;
+    }
+
+    .menuIcon {
+        font-size: 2rem;
+        margin-bottom: 8px;
+    }
+
+    .menuTitle {
+        font-size: 1rem;
+    }
+
+    .menuDescription {
+        font-size: 0.7rem;
+    }
+}
+
+/* 세로모드 (portrait) */
+@media (max-width: 768px) and (orientation: portrait) {
+    .content {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .tripHeader {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px;
+        gap: 20px;
+    }
+
+    .tripImage {
+        width: 100px;
+        height: 100px;
+    }
+
+    .emoji {
+        font-size: 3rem;
+    }
+
+    .tripTitle {
+        font-size: 2.2rem;
+    }
+
+    .tripDate {
+        font-size: 1.2rem;
+    }
+
+    .menuGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .menuItem {
+        padding: 25px;
+    }
+
+    .menuIcon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+
+    .menuTitle {
+        font-size: 1.4rem;
+    }
+
+    .menuDescription {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .tripHeader {
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .tripImage {
+        width: 80px;
+        height: 80px;
+    }
+
+    .emoji {
+        font-size: 2.5rem;
+    }
+
+    .tripTitle {
+        font-size: 1.8rem;
+    }
+
+    .tripDate {
+        font-size: 1.1rem;
+    }
+
+    .tripDescription {
+        font-size: 1rem;
+    }
+
+    .menuGrid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .menuItem {
+        padding: 20px;
+    }
+
+    .menuIcon {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+    }
+
+    .menuTitle {
+        font-size: 1.3rem;
+    }
+
+    .menuDescription {
+        font-size: 0.95rem;
+    }
+}

@@ -3,32 +3,38 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@remotion/bundler": "4.0.341",
     "@remotion/cli": "4.0.341",
     "@remotion/google-fonts": "4.0.341",
-    "@remotion/bundler": "4.0.341",
     "@remotion/lambda": "4.0.341",
     "@remotion/paths": "4.0.341",
     "@remotion/player": "4.0.341",
     "@remotion/shapes": "4.0.341",
+    "axios": "^1.12.2",
+    "firebase": "^12.4.0",
     "next": "15.2.4",
+    "next-pwa": "^5.6.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "remotion": "4.0.341",
+    "sharp": "^0.34.4",
+    "workbox-webpack-plugin": "^7.3.0",
     "zod": "3.22.3"
   },
   "devDependencies": {
-    "dotenv": "16.0.3",
-    "@remotion/eslint-plugin": "4.0.341",
     "@eslint/eslintrc": "3.1.0",
+    "@next/eslint-plugin-next": "15.1.6",
+    "@remotion/eslint-plugin": "4.0.341",
     "@types/node": "20.12.14",
     "@types/react": "19.0.0",
     "@types/react-dom": "19.0.0",
     "@types/web": "0.0.166",
+    "dotenv": "16.0.3",
     "eslint": "9.19.0",
-    "@next/eslint-plugin-next": "15.1.6",
     "eslint-config-next": "15.1.6",
+    "prettier": "3.6.0",
     "typescript": "5.8.2",
-    "prettier": "3.6.0"
+    "vercel": "^48.5.0"
   },
   "scripts": {
     "dev": "next dev",
@@ -37,6 +43,9 @@
     "lint": "eslint .",
     "remotion": "remotion studio",
     "render": "remotion render",
-    "deploy": "node deploy.mjs"
+    "deploy": "node deploy.mjs",
+    "pwa:build": "next build && next export",
+    "pwa:start": "next start",
+    "generate-icons": "node scripts/generate-icons.js"
   }
 }

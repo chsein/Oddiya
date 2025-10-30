@@ -1,0 +1,156 @@
+import type { NextPage } from "next";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
+import Header from "../components/Header";
+import styles from "../styles/TripList.module.css";
+import { getTrips, Trip } from "../helpers/api";
+
+const TripList: NextPage = () => {
+    const router = useRouter();
+    const [trips, setTrips] = useState<Trip[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // API에서 여행 목록 가져오기
+    const fetchTrips = async () => {
+        try {
+            setLoading(true);
+            const data = await getTrips();
+
+            // 데이터가 배열인지 확인하고, 아니면 빈 배열로 설정
+            const tripsArray = Array.isArray(data) ? data : [];
+            setTrips(tripsArray);
+        } catch (err) {
+            console.error('Error fetching trips:', err);
+            setError('여행 목록을 불러오는데 실패했습니다.');
+            // 에러 발생 시에도 빈 배열로 설정
+            setTrips([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const handleAddTrip = () => {
+        router.push('/addTrip');
+    };
+
+
+    const handleTripClick = (tripId: string) => {
+        router.push(`/contentMenu?tripId=${tripId}`);
+    };
+
+    // 컴포넌트 마운트 시 API 호출
+    useEffect(() => {
+        fetchTrips();
+    }, []);
+
+    // 날짜 포맷팅 함수
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).replace(/\./g, '.').replace(/\s/g, '');
+    };
+
+    return (
+        <div>
+            <Head>
+                <title>여행 목록 - ODDIYA</title>
+                <meta name="description" content="나만의 여행 목록을 확인해보세요" />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1, maximum-scale=1"
+                />
+                <link rel="icon" href="/favicon.ico" />
+            </Head>
+            <div className={styles.container}>
+                <Header
+                    backgroundColor="#00FFAA"
+                    leftIcons={['←', '🏠']}
+                    rightIcons={['➕', '⚙️']}
+                    title="여행 기록"
+                    rightButton={{
+                        text: "추가하기",
+                        onClick: handleAddTrip
+                    }}
+                />
+
+                <div className={styles.content}>
+                    {/* 로딩 상태 */}
+                    {loading && (
+                        <div className={styles.loadingContainer}>
+                            <div className={styles.loadingSpinner}></div>
+                            <p>여행 목록을 불러오는 중...</p>
+                        </div>
+                    )}
+
+                    {/* 에러 상태 */}
+                    {error && (
+                        <div className={styles.errorContainer}>
+                            <p>{error}</p>
+                            <button onClick={fetchTrips} className={styles.retryButton}>
+                                다시 시도
+                            </button>
+                        </div>
+                    )}
+
+                    {/* 여행 목록이 0개일 때 */}
+                    {(() => {
+                        console.log('🚗 Empty state check - loading:', loading, 'error:', error, 'trips:', trips, 'trips.length:', trips?.length);
+                        console.log('🚗 Empty conditions - !loading:', !loading, '!error:', !error, 'Array.isArray(trips):', Array.isArray(trips), 'trips.length === 0:', trips?.length === 0);
+                        return !loading && !error && Array.isArray(trips) && trips.length === 0;
+                    })() && (
+                            <div className={styles.emptyState}>
+                                <div className={styles.emptyIcon}>✈️</div>
+                                <h3 className={styles.emptyTitle}>아직 여행이 없어요</h3>
+                                <p className={styles.emptyDescription}>첫 번째 여행을 추가해보세요!</p>
+                                <button
+                                    className={styles.addTripButton}
+                                    onClick={handleAddTrip}
+                                >
+                                    여행 추가하기
+                                </button>
+                            </div>
+                        )}
+
+                    {/* 여행 목록 */}
+                    {(() => {
+                        console.log('🚗 Render check - loading:', loading, 'error:', error, 'trips:', trips, 'trips.length:', trips?.length);
+                        console.log('🚗 Conditions - !loading:', !loading, '!error:', !error, 'Array.isArray(trips):', Array.isArray(trips), 'trips.length > 0:', trips?.length > 0);
+                        return !loading && !error && Array.isArray(trips) && trips.length > 0;
+                    })() && (
+                            <div
+                                className={styles.tripGrid}
+                            >
+                                {trips.map((trip) => (
+                                    <div
+                                        key={trip.id}
+                                        className={styles.tripCard}
+                                        onClick={() => handleTripClick(trip.id)}
+                                    >
+                                        <div className={styles.cardImage}>
+                                            <span className={styles.emoji}>{trip.image || "✈️"}</span>
+                                        </div>
+                                        <div className={styles.cardContent}>
+                                            <p className={styles.cardTitle}>{trip.tripName}/{trip.destinationCity}</p>
+
+                                            <p className={styles.cardDateRange}>
+                                                {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default TripList;
