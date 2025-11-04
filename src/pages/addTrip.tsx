@@ -3,6 +3,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import Header from "../components/Header";
+import ProtectedRoute from "../components/ProtectedRoute";
 import styles from "../styles/AddTrip.module.css";
 import { createTrip, CreateTripRequest } from "../helpers/api";
 
@@ -132,14 +133,15 @@ const AddTrip: NextPage = () => {
     };
 
     return (
-        <div>
-            <Head>
-                <title>여행 추가 - ODDIYA</title>
-                <meta name="description" content="새로운 여행을 추가해보세요" />
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1, maximum-scale=1"
-                />
+        <ProtectedRoute>
+            <>
+                <Head>
+                    <title>여행 추가 - ODDIYA</title>
+                    <meta name="description" content="새로운 여행을 추가해보세요" />
+                    <meta
+                        name="viewport"
+                        content="width=device-width, initial-scale=1, maximum-scale=1"
+                    />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <div className={styles.container}>
@@ -316,6 +318,8 @@ const AddTrip: NextPage = () => {
                 )}
             </div>
         </div>
+            </>
+        </ProtectedRoute>
     );
 };
 

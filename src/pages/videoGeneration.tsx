@@ -5,6 +5,7 @@ import { NextPage, GetServerSideProps } from 'next';
 import { Player } from '@remotion/player';
 import styles from '../styles/VideoGeneration.module.css';
 import Header from '../components/Header';
+import ProtectedRoute from '../components/ProtectedRoute';
 import { BeatVideo } from '../remotion/MyComp/BeatVideo';
 
 interface Photo {
@@ -316,13 +317,14 @@ const VideoGeneration: NextPage = () => {
     };
 
     return (
-        <div>
-            <Head>
-                <title>영상 생성하기 - ODDIYA</title>
-                <meta name="description" content="여행 사진으로 영상을 만들어보세요" />
-                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
+        <ProtectedRoute>
+            <>
+                <Head>
+                    <title>영상 생성하기 - ODDIYA</title>
+                    <meta name="description" content="여행 사진으로 영상을 만들어보세요" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+                    <link rel="icon" href="/favicon.ico" />
+                </Head>
             <div className={styles.container}>
                 <Header
                     backgroundColor="#00EEFF"
@@ -499,6 +501,8 @@ const VideoGeneration: NextPage = () => {
                 )}
             </div>
         </div>
+            </>
+        </ProtectedRoute>
     );
 };
 
