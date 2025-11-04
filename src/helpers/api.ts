@@ -209,26 +209,12 @@ apiClient.interceptors.response.use(
 // 지역별 컨텐츠 조회 API
 export const getContentsByRegion = async (regionName: string): Promise<ContentsResponse> => {
     try {
-        // 한글 regionName을 인코딩하지 않고 직접 URL에 포함
-        const fullUrl = `${API_BASE_URL}/api/v1/contents/regions/${regionName}`;
-        console.log('🌍 API 호출 URL (인코딩 전):', fullUrl);
+        console.log('🌍 API 호출 - Region:', regionName);
 
-        // fetch를 사용하여 URL 인코딩을 완전히 방지
-        const response = await fetch(fullUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true',
-                'User-Agent': 'ODDIYA-Frontend/1.0',
-            },
-        });
+        // apiClient를 사용하여 Authorization 헤더 자동 포함
+        const response = await apiClient.get(`/api/v1/contents/regions/${regionName}`);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data: ContentsResponse = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('Error fetching contents by region:', error);
         throw error;
