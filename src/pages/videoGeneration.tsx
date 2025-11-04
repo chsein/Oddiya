@@ -318,14 +318,14 @@ const VideoGeneration: NextPage = () => {
 
     return (
         <ProtectedRoute>
-            <>
+            <div>
                 <Head>
                     <title>영상 생성하기 - ODDIYA</title>
                     <meta name="description" content="여행 사진으로 영상을 만들어보세요" />
                     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
                     <link rel="icon" href="/favicon.ico" />
                 </Head>
-            <div className={styles.container}>
+                <div className={styles.container}>
                 <Header
                     backgroundColor="#00EEFF"
                     leftIcons={['⛰️']}
@@ -499,9 +499,8 @@ const VideoGeneration: NextPage = () => {
                         </div>
                     </div>
                 )}
+                </div>
             </div>
-        </div>
-            </>
         </ProtectedRoute>
     );
 };

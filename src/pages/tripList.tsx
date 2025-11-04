@@ -3,11 +3,14 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { useAuth } from "../contexts/AuthContext";
 import styles from "../styles/TripList.module.css";
 import { getTrips, Trip } from "../helpers/api";
 
 const TripList: NextPage = () => {
     const router = useRouter();
+    const { user, loading: authLoading } = useAuth();
     const [trips, setTrips] = useState<Trip[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -41,10 +44,12 @@ const TripList: NextPage = () => {
         router.push(`/contentMenu?tripId=${tripId}`);
     };
 
-    // 컴포넌트 마운트 시 API 호출
+    // 사용자가 로그인된 후 API 호출
     useEffect(() => {
-        fetchTrips();
-    }, []);
+        if (!authLoading && user) {
+            fetchTrips();
+        }
+    }, [authLoading, user]);
 
     // 날짜 포맷팅 함수
     const formatDate = (dateString: string) => {
@@ -57,17 +62,18 @@ const TripList: NextPage = () => {
     };
 
     return (
-        <div>
-            <Head>
-                <title>여행 목록 - ODDIYA</title>
-                <meta name="description" content="나만의 여행 목록을 확인해보세요" />
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1, maximum-scale=1"
-                />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-            <div className={styles.container}>
+        <ProtectedRoute>
+            <div>
+                <Head>
+                    <title>여행 목록 - ODDIYA</title>
+                    <meta name="description" content="나만의 여행 목록을 확인해보세요" />
+                    <meta
+                        name="viewport"
+                        content="width=device-width, initial-scale=1, maximum-scale=1"
+                    />
+                    <link rel="icon" href="/favicon.ico" />
+                </Head>
+                <div className={styles.container}>
                 <Header
                     backgroundColor="#00FFAA"
                     leftIcons={['←', '🏠']}
@@ -148,8 +154,9 @@ const TripList: NextPage = () => {
                         )}
 
                 </div>
+                </div>
             </div>
-        </div>
+        </ProtectedRoute>
     );
 };
 

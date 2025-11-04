@@ -134,7 +134,7 @@ const AddTrip: NextPage = () => {
 
     return (
         <ProtectedRoute>
-            <>
+            <div>
                 <Head>
                     <title>여행 추가 - ODDIYA</title>
                     <meta name="description" content="새로운 여행을 추가해보세요" />
@@ -142,9 +142,9 @@ const AddTrip: NextPage = () => {
                         name="viewport"
                         content="width=device-width, initial-scale=1, maximum-scale=1"
                     />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-            <div className={styles.container}>
+                    <link rel="icon" href="/favicon.ico" />
+                </Head>
+                <div className={styles.container}>
                 <Header
                     backgroundColor="#00FFAA"
                     leftIcons={['←', '📝']}
@@ -316,9 +316,8 @@ const AddTrip: NextPage = () => {
                         </div>
                     </div>
                 )}
+                </div>
             </div>
-        </div>
-            </>
         </ProtectedRoute>
     );
 };
