@@ -3,11 +3,14 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { useAuth } from "../contexts/AuthContext";
 import styles from "../styles/ContentList.module.css";
 import { getContentsByRegion, ContentItem, addBasketItem, BasketItemRequest, getBasket } from "../helpers/api";
 
 const ContentList: NextPage = () => {
     const router = useRouter();
+    const { user, loading: authLoading } = useAuth();
     const { tripId, regionName } = router.query;
     const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
     const [destinations, setDestinations] = useState<ContentItem[]>([]);
@@ -18,9 +21,14 @@ const ContentList: NextPage = () => {
     const safeTripId = Array.isArray(tripId) ? tripId[0] : tripId;
     const safeRegionName = Array.isArray(regionName) ? regionName[0] : regionName;
 
-    // API에서 여행지 데이터 불러오기
+    // 사용자 로그인 후 API에서 여행지 데이터 불러오기
     useEffect(() => {
         const fetchDestinations = async () => {
+            // 인증 로딩 중이거나 user가 없으면 대기
+            if (authLoading || !user) {
+                return;
+            }
+
             if (!safeRegionName) {
                 setError('지역 정보가 없습니다.');
                 setLoading(false);
@@ -92,7 +100,7 @@ const ContentList: NextPage = () => {
         };
 
         fetchDestinations();
-    }, [safeRegionName]);
+    }, [authLoading, user, safeRegionName]);
 
     // 테스트용: 강제로 선택 상태 설정 (나중에 제거)
     useEffect(() => {
@@ -102,7 +110,8 @@ const ContentList: NextPage = () => {
     useEffect(() => {
         // 서버에서 이미 선택된 여행지 불러오기
         const loadBasketItems = async () => {
-            if (!safeTripId) {
+            // 인증 로딩 중이거나 user가 없으면 대기
+            if (authLoading || !user || !safeTripId) {
                 return;
             }
 
@@ -124,7 +133,7 @@ const ContentList: NextPage = () => {
         };
 
         loadBasketItems();
-    }, [safeTripId]);
+    }, [authLoading, user, safeTripId]);
 
     // 페이지 포커스 시에도 선택 상태 다시 로드
     useEffect(() => {
@@ -258,17 +267,18 @@ const ContentList: NextPage = () => {
 
 
     return (
-        <div>
-            <Head>
-                <title>여행지 선택 - ODDIYA</title>
-                <meta name="description" content="가고 싶은 곳을 선택해보세요" />
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1, maximum-scale=1"
-                />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-            <div className={styles.container}>
+        <ProtectedRoute>
+            <div>
+                <Head>
+                    <title>여행지 선택 - ODDIYA</title>
+                    <meta name="description" content="가고 싶은 곳을 선택해보세요" />
+                    <meta
+                        name="viewport"
+                        content="width=device-width, initial-scale=1, maximum-scale=1"
+                    />
+                    <link rel="icon" href="/favicon.ico" />
+                </Head>
+                <div className={styles.container}>
                 <Header
                     backgroundColor="#FFE135"
                     leftIcons={['🛟', '🧴']}
@@ -353,8 +363,9 @@ const ContentList: NextPage = () => {
                         </div>
                     )}
                 </div>
+                </div>
             </div>
-        </div>
+        </ProtectedRoute>
     );
 };
 

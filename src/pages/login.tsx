@@ -4,20 +4,37 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../helpers/firebase';
+import {
+    signInWithGoogle,
+    signInWithGoogleRedirect,
+    signInWithApple,
+    signInWithAppleRedirect,
+    isMobile,
+    signOut as firebaseSignOut,
+    getCurrentUserIdToken
+} from '../lib/firebase/auth';
+import { useAuth } from '../contexts/AuthContext';
 import Header from "../components/Header";
 import styles from "../styles/LoginPage.module.css";
 
 const Login: NextPage = () => {
     const router = useRouter();
+    const { user, loading } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [tokenInfo, setTokenInfo] = useState<string>('');
 
     const handleLogin = (email: string) => {
         console.log('Login successful:', { email });
-        router.push('/tripList');
+
+        // returnUrl이 있으면 해당 페이지로, 없으면 tripList로 이동
+        const returnUrl = router.query.returnUrl as string;
+        const redirectPath = returnUrl || '/tripList';
+
+        router.push(redirectPath);
     };
 
     const handleBack = () => {
@@ -46,6 +63,79 @@ const Login: NextPage = () => {
             setError(error.message || '로그인/회원가입에 실패했습니다.');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            // 모바일이면 리다이렉트 방식, 데스크톱이면 팝업 방식
+            if (isMobile()) {
+                await signInWithGoogleRedirect();
+                // 리다이렉트되므로 이후 코드는 실행되지 않음
+            } else {
+                const result = await signInWithGoogle();
+                console.log('✅ Google 로그인 성공:', result.user.email);
+                handleLogin(result.user.email || 'Google User');
+            }
+        } catch (error: any) {
+            console.error('❌ Google 로그인 실패:', error);
+            setError(error.message || 'Google 로그인에 실패했습니다.');
+            setIsLoading(false);
+        }
+    };
+
+    const handleAppleLogin = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            // 모바일이면 리다이렉트 방식, 데스크톱이면 팝업 방식
+            if (isMobile()) {
+                await signInWithAppleRedirect();
+                // 리다이렉트되므로 이후 코드는 실행되지 않음
+            } else {
+                const result = await signInWithApple();
+                console.log('✅ Apple 로그인 성공:', result.user.email);
+                handleLogin(result.user.email || 'Apple User');
+            }
+        } catch (error: any) {
+            console.error('❌ Apple 로그인 실패:', error);
+            setError(error.message || 'Apple 로그인에 실패했습니다.');
+            setIsLoading(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await firebaseSignOut();
+            console.log('✅ 로그아웃 성공');
+            setTokenInfo('');
+            setError(null);
+        } catch (error: any) {
+            console.error('❌ 로그아웃 실패:', error);
+            setError(error.message || '로그아웃에 실패했습니다.');
+        }
+    };
+
+    const handleCheckToken = async () => {
+        try {
+            const token = await getCurrentUserIdToken();
+            if (token) {
+                // 토큰의 앞부분만 표시
+                const tokenPreview = token.substring(0, 50) + '...';
+                setTokenInfo(`Token: ${tokenPreview}`);
+                console.log('✅ Firebase ID Token:', token);
+                // jwt.io에서 디코딩 가능하도록 전체 토큰도 콘솔에 출력
+                console.log('📋 Copy this token to jwt.io to decode:', token);
+            } else {
+                setTokenInfo('토큰이 없습니다. 로그인이 필요합니다.');
+            }
+        } catch (error: any) {
+            console.error('❌ 토큰 가져오기 실패:', error);
+            setError(error.message || '토큰을 가져올 수 없습니다.');
         }
     };
 
@@ -79,6 +169,62 @@ const Login: NextPage = () => {
                 <div className={styles.content}>
                     <div className={styles.loginCard}>
 
+                        {/* 로그인 상태 표시 (테스트용) */}
+                        {user && (
+                            <div style={{
+                                marginBottom: '20px',
+                                padding: '15px',
+                                backgroundColor: '#e8f5e9',
+                                borderRadius: '8px',
+                                border: '1px solid #4caf50'
+                            }}>
+                                <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#2e7d32' }}>
+                                    ✅ 로그인됨: {user.email}
+                                </p>
+                                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                    <button
+                                        type="button"
+                                        onClick={handleCheckToken}
+                                        style={{
+                                            padding: '8px 16px',
+                                            backgroundColor: '#2196f3',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontSize: '14px'
+                                        }}
+                                    >
+                                        토큰 확인
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleLogout}
+                                        style={{
+                                            padding: '8px 16px',
+                                            backgroundColor: '#f44336',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontSize: '14px'
+                                        }}
+                                    >
+                                        로그아웃
+                                    </button>
+                                </div>
+                                {tokenInfo && (
+                                    <p style={{
+                                        marginTop: '10px',
+                                        fontSize: '12px',
+                                        color: '#555',
+                                        wordBreak: 'break-all'
+                                    }}>
+                                        {tokenInfo}
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         <form onSubmit={handleSubmit} className={styles.form}>
                             <div className={styles.inputGroup}>
@@ -129,20 +275,30 @@ const Login: NextPage = () => {
                             </button>
                         </form>
 
-                        {/* <div className={styles.divider}>
+                        <div className={styles.divider}>
                             <span>또는</span>
                         </div>
 
-                         <div className={styles.socialLogin}>
-                            <button className={styles.socialButton}>
+                        <div className={styles.socialLogin}>
+                            <button
+                                type="button"
+                                className={styles.socialButton}
+                                onClick={handleGoogleLogin}
+                                disabled={isLoading}
+                            >
                                 <span className={styles.socialIcon}>📧</span>
                                 Google로 로그인
                             </button>
-                            <button className={styles.socialButton}>
+                            <button
+                                type="button"
+                                className={styles.socialButton}
+                                onClick={handleAppleLogin}
+                                disabled={isLoading}
+                            >
                                 <span className={styles.socialIcon}>🍎</span>
                                 Apple로 로그인
                             </button>
-                        </div> */}
+                        </div>
 
                         <div className={styles.footer}>
                             <div>

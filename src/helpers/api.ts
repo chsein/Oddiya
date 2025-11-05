@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import { getCurrentUserIdToken, refreshIdToken } from '../lib/firebase/auth';
 
 // API 관련 타입 정의
 export interface ContentItem {
@@ -123,8 +124,8 @@ export interface TripResponse {
     timestamp: string;
 }
 
-// API 기본 URL
-const API_BASE_URL = 'https://c782ebba9ac1.ngrok-free.app';
+// API 기본 URL - 환경 변수에서 주입
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:8080';
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
@@ -137,10 +138,27 @@ const apiClient = axios.create({
     },
 });
 
-// 요청 인터셉터
+// 요청 인터셉터 - Firebase ID Token 자동 추가
 apiClient.interceptors.request.use(
-    (config) => {
+    async (config) => {
         console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+
+        try {
+            // Firebase ID Token 가져오기
+            const idToken = await getCurrentUserIdToken();
+
+            if (idToken) {
+                // Authorization 헤더에 Bearer 토큰 추가
+                config.headers.Authorization = `Bearer ${idToken}`;
+                console.log('✅ Firebase ID Token added to request');
+            } else {
+                console.warn('⚠️ No Firebase ID Token available - user may not be logged in');
+            }
+        } catch (error) {
+            console.error('❌ Failed to get Firebase ID Token:', error);
+            // 토큰 가져오기 실패해도 요청은 계속 진행 (공개 API 지원)
+        }
+
         return config;
     },
     (error) => {
@@ -149,13 +167,40 @@ apiClient.interceptors.request.use(
     }
 );
 
-// 응답 인터셉터
+// 응답 인터셉터 - 토큰 만료 시 자동 갱신
 apiClient.interceptors.response.use(
     (response) => {
         console.log(`API Response: ${response.status} ${response.config.url}`);
         return response;
     },
-    (error) => {
+    async (error) => {
+        const originalRequest = error.config;
+
+        // 401 Unauthorized 에러 & 토큰 갱신을 시도하지 않은 경우
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                console.log('🔄 Token expired, attempting to refresh...');
+
+                // Firebase ID Token 강제 갱신
+                const newToken = await refreshIdToken();
+
+                if (newToken) {
+                    // 새 토큰으로 헤더 업데이트
+                    originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                    console.log('✅ Token refreshed, retrying request');
+
+                    // 원래 요청 재시도
+                    return apiClient(originalRequest);
+                }
+            } catch (refreshError) {
+                console.error('❌ Token refresh failed:', refreshError);
+                // 토큰 갱신 실패 시 로그인 페이지로 리다이렉트 (클라이언트에서 처리)
+                return Promise.reject(refreshError);
+            }
+        }
+
         console.error('Response Error:', error.response?.status, error.message);
         return Promise.reject(error);
     }
@@ -164,26 +209,12 @@ apiClient.interceptors.response.use(
 // 지역별 컨텐츠 조회 API
 export const getContentsByRegion = async (regionName: string): Promise<ContentsResponse> => {
     try {
-        // 한글 regionName을 인코딩하지 않고 직접 URL에 포함
-        const fullUrl = `${API_BASE_URL}/api/v1/contents/regions/${regionName}`;
-        console.log('🌍 API 호출 URL (인코딩 전):', fullUrl);
+        console.log('🌍 API 호출 - Region:', regionName);
 
-        // fetch를 사용하여 URL 인코딩을 완전히 방지
-        const response = await fetch(fullUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'ngrok-skip-browser-warning': 'true',
-                'User-Agent': 'ODDIYA-Frontend/1.0',
-            },
-        });
+        // apiClient를 사용하여 Authorization 헤더 자동 포함
+        const response = await apiClient.get(`/api/v1/contents/regions/${regionName}`);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data: ContentsResponse = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('Error fetching contents by region:', error);
         throw error;
