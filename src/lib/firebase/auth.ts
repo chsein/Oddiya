@@ -198,15 +198,37 @@ export const syncUserWithBackend = async (user: User): Promise<void> => {
     try {
         const idToken = await user.getIdToken();
 
+        // ✅ OAuth provider data에서 fallback 정보 추출
+        const providerData = user.providerData[0];
+
+        // ✅ 이메일: user.email 또는 providerData.email 사용
+        const email = user.email || providerData?.email || null;
+
+        // ✅ 표시 이름: user.displayName 또는 providerData.displayName 사용
+        const displayName = user.displayName || providerData?.displayName || null;
+
+        // ✅ 프로필 사진: user.photoURL 또는 providerData.photoURL 사용
+        const photoUrl = user.photoURL || providerData?.photoURL || null;
+
+        // ✅ Provider ID
+        const provider = providerData?.providerId || 'unknown';
+
+        console.log('📤 백엔드 동기화 요청:', {
+            firebaseUid: user.uid,
+            email,
+            displayName,
+            provider
+        });
+
         // 백엔드 API 호출: POST /api/v1/auth/login-or-register
         const response = await axios.post(
             `${API_BASE_URL}/api/v1/auth/login-or-register`,
             {
                 firebaseUid: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-                photoUrl: user.photoURL,
-                provider: user.providerData[0]?.providerId || 'unknown'
+                email,
+                displayName,
+                photoUrl,
+                provider
             },
             {
                 headers: {
