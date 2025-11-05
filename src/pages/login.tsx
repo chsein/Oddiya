@@ -208,7 +208,7 @@ const Login: NextPage = () => {
                                 border: '1px solid #4caf50'
                             }}>
                                 <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#2e7d32' }}>
-                                    ✅ 로그인됨: {user.email}
+                                    ✅ 로그인됨: {user.email || user.providerData[0]?.email || user.displayName || 'User'}
                                 </p>
                                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                                     <button
