@@ -127,9 +127,13 @@ const ContentDetail: NextPage = () => {
     // from 파라미터 안전하게 처리
     const safeFrom = Array.isArray(from) ? from[0] : from;
     const isFromCollection = safeFrom === 'collection';
+    const isFromSchedule = safeFrom === 'schedule';
 
     const handleBack = () => {
-        if (isFromCollection) {
+        if (isFromSchedule) {
+            // scheduleConfirmation에서 왔으면 scheduleConfirmation으로 돌아가기
+            router.push(`/scheduleConfirmation?tripId=${safeTripId}`);
+        } else if (isFromCollection) {
             // collectionList에서 왔으면 collectionList로 돌아가기
             router.push(`/collectionList?tripId=${safeTripId}`);
         } else if (safeRegionName) {

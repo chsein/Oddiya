@@ -172,7 +172,7 @@ const ScheduleConfirmation: NextPage = () => {
     };
 
     const handleViewDetails = (destinationId: number) => {
-        router.push(`/contentDetail?tripId=${safeTripId}&destinationId=${destinationId}`);
+        router.push(`/contentDetail?tripId=${safeTripId}&destinationId=${destinationId}&from=schedule`);
     };
 
     const handleScheduleCardClick = (activityId: number) => {

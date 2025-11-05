@@ -4,16 +4,16 @@ interface NaverMapProps {
     width?: string;
     height?: string;
     markers?: Array<{
-        id: number;
-        title: string;
+        id: number | string;
+        title?: string;
         lat: number;
         lng: number;
-        category: string;
+        category?: string;
     }>;
 }
 
 export interface NaverMapRef {
-    openInfoWindow: (markerId: number) => void;
+    openInfoWindow: (markerId: number | string) => void;
     closeInfoWindow: () => void;
 }
 
@@ -66,41 +66,83 @@ const NaverMap = forwardRef<NaverMapRef, NaverMapProps>(({
             mapInstance.current = new window.naver.maps.Map(mapRef.current, mapOptions);
 
             // 기존 마커와 정보창 정리
-            markersRef.current.forEach(marker => marker.setMap(null));
-            infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
+            markersRef.current.forEach(marker => {
+                if (marker && typeof marker.setMap === 'function') {
+                    try {
+                        // getMap() 호출 없이 직접 setMap(null) 호출
+                        // 오류가 발생하면 무시 (이미 제거된 마커)
+                        marker.setMap(null);
+                    } catch (error) {
+                        // 마커가 이미 제거되었거나 오류가 발생한 경우 무시
+                    }
+                }
+            });
+            infoWindowsRef.current.forEach(infoWindow => {
+                if (infoWindow && typeof infoWindow.close === 'function') {
+                    try {
+                        // getMap() 호출 없이 직접 close() 호출
+                        // 오류가 발생하면 무시 (이미 닫힌 정보창)
+                        infoWindow.close();
+                    } catch (error) {
+                        // 정보창이 이미 닫혔거나 오류가 발생한 경우 무시
+                    }
+                }
+            });
             markersRef.current = [];
             infoWindowsRef.current = [];
 
             // 마커 추가
             markers.forEach((marker) => {
+                // 유효성 검사
+                if (!marker || typeof marker.lat !== 'number' || typeof marker.lng !== 'number') {
+                    console.warn('유효하지 않은 마커 데이터:', marker);
+                    return;
+                }
+
                 const markerPosition = new window.naver.maps.LatLng(marker.lat, marker.lng);
 
-                const markerInstance = new window.naver.maps.Marker({
+                // 마커 옵션 준비
+                const markerOptions: any = {
                     position: markerPosition,
-                    map: mapInstance.current,
-                    title: marker.title,
-                    icon: {
-                        content: `
-                        <div style="
-                            background: #00EEFF;
-                            border: 2px solid #000;
-                            border-radius: 50%;
-                            width: 30px;
-                            height: 30px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            font-size: 16px;
-                            font-weight: bold;
-                            color: #000;
-                        ">
-                            ${getCategoryIcon(marker.category)}
-                        </div>
-                    `,
+                    map: mapInstance.current
+                };
+
+                // title이 있으면 추가 (null이 아닐 때만)
+                if (marker.title && typeof marker.title === 'string') {
+                    markerOptions.title = marker.title;
+                }
+
+                // 아이콘 설정
+                const iconContent = `
+                    <div style="
+                        background: #00EEFF;
+                        border: 2px solid #000;
+                        border-radius: 50%;
+                        width: 30px;
+                        height: 30px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 16px;
+                        font-weight: bold;
+                        color: #000;
+                    ">
+                        ${getCategoryIcon(marker.category || '')}
+                    </div>
+                `;
+
+                try {
+                    markerOptions.icon = {
+                        content: iconContent,
                         size: new window.naver.maps.Size(30, 30),
                         anchor: new window.naver.maps.Point(15, 15)
-                    }
-                });
+                    };
+                } catch (error) {
+                    console.error('아이콘 생성 실패:', error);
+                    // 아이콘 없이 마커 생성
+                }
+
+                const markerInstance = new window.naver.maps.Marker(markerOptions);
 
                 // 정보창 추가
                 const infoWindow = new window.naver.maps.InfoWindow({
@@ -121,7 +163,7 @@ const NaverMap = forwardRef<NaverMapRef, NaverMapProps>(({
                             font-weight: bold; 
                             color: #000;
                             line-height: 1.3;
-                        ">${marker.title}</div>
+                        ">${marker.title || '제목 없음'}</div>
                         
                         <!-- 커스텀 화살표 -->
                         <div style="
@@ -182,27 +224,69 @@ const NaverMap = forwardRef<NaverMapRef, NaverMapProps>(({
 
         // cleanup 함수
         return () => {
-            if (mapInstance.current) {
-                // 기존 마커와 정보창 정리
-                markersRef.current.forEach(marker => marker.setMap(null));
-                infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
-            }
+            // 기존 마커와 정보창 정리 (mapInstance가 없어도 정리)
+            markersRef.current.forEach(marker => {
+                if (marker && typeof marker.setMap === 'function') {
+                    try {
+                        // getMap() 호출 없이 직접 setMap(null) 호출
+                        // 오류가 발생하면 무시 (이미 제거된 마커)
+                        marker.setMap(null);
+                    } catch (error) {
+                        // 마커가 이미 제거되었거나 오류가 발생한 경우 무시
+                    }
+                }
+            });
+            infoWindowsRef.current.forEach(infoWindow => {
+                if (infoWindow && typeof infoWindow.close === 'function') {
+                    try {
+                        // getMap() 호출 없이 직접 close() 호출
+                        // 오류가 발생하면 무시 (이미 닫힌 정보창)
+                        infoWindow.close();
+                    } catch (error) {
+                        // 정보창이 이미 닫혔거나 오류가 발생한 경우 무시
+                    }
+                }
+            });
+            markersRef.current = [];
+            infoWindowsRef.current = [];
         };
     }, [markers]);
 
     // 외부에서 지도 제어할 수 있는 함수들
     useImperativeHandle(ref, () => ({
-        openInfoWindow: (markerId: number) => {
+        openInfoWindow: (markerId: number | string) => {
             const markerIndex = markers.findIndex(marker => marker.id === markerId);
-            if (markerIndex !== -1 && infoWindowsRef.current[markerIndex]) {
-                // 다른 정보창들 닫기
-                infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
-                // 해당 마커의 정보창 열기
-                infoWindowsRef.current[markerIndex].open(mapInstance.current, markersRef.current[markerIndex]);
+            if (markerIndex !== -1 && infoWindowsRef.current[markerIndex] && markersRef.current[markerIndex] && mapInstance.current) {
+                try {
+                    // 다른 정보창들 닫기
+                    infoWindowsRef.current.forEach(infoWindow => {
+                        if (infoWindow && typeof infoWindow.close === 'function') {
+                            try {
+                                infoWindow.close();
+                            } catch (error) {
+                                // 이미 닫힌 정보창 무시
+                            }
+                        }
+                    });
+                    // 해당 마커의 정보창 열기
+                    if (typeof infoWindowsRef.current[markerIndex].open === 'function') {
+                        infoWindowsRef.current[markerIndex].open(mapInstance.current, markersRef.current[markerIndex]);
+                    }
+                } catch (error) {
+                    console.error('정보창 열기 실패:', error);
+                }
             }
         },
         closeInfoWindow: () => {
-            infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
+            infoWindowsRef.current.forEach(infoWindow => {
+                if (infoWindow && typeof infoWindow.close === 'function') {
+                    try {
+                        infoWindow.close();
+                    } catch (error) {
+                        // 이미 닫힌 정보창 무시
+                    }
+                }
+            });
         }
     }));
 
