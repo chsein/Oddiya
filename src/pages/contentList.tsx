@@ -6,7 +6,18 @@ import Header from "../components/Header";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "../styles/ContentList.module.css";
-import { getContentsByRegion, ContentItem, addBasketItem, deleteBasketItem, BasketItemRequest, getBasket } from "../helpers/api";
+import { getContentsByRegion, getContentsByType, ContentItem, addBasketItem, deleteBasketItem, BasketItemRequest, getBasket } from "../helpers/api";
+
+// 컨텐츠 타입 매핑
+const CONTENT_TYPES = [
+    { id: 12, name: '관광지' },
+    { id: 14, name: '문화시설' },
+    { id: 15, name: '축제/공연' },
+    { id: 28, name: '레포츠' },
+    { id: 32, name: '숙박' },
+    { id: 38, name: '쇼핑' },
+    { id: 39, name: '음식점' },
+];
 
 const ContentList: NextPage = () => {
     const router = useRouter();
@@ -16,6 +27,7 @@ const ContentList: NextPage = () => {
     const [destinations, setDestinations] = useState<ContentItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedFilter, setSelectedFilter] = useState<number | null>(null); // 선택된 필터
 
     // tripId와 regionName을 안전하게 처리
     const safeTripId = Array.isArray(tripId) ? tripId[0] : tripId;
@@ -29,7 +41,7 @@ const ContentList: NextPage = () => {
                 return;
             }
 
-            if (!safeRegionName) {
+            if (!safeRegionName && !selectedFilter) {
                 setError('지역 정보가 없습니다.');
                 setLoading(false);
                 return;
@@ -38,34 +50,15 @@ const ContentList: NextPage = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await getContentsByRegion(safeRegionName);
+
+                // 지역별 API 호출 (필터가 있으면 contentTypeId 파라미터 추가)
+                const response = await getContentsByRegion(safeRegionName!, selectedFilter || undefined);
 
                 console.log('=== API 응답 전체 ===');
                 console.log(response);
-                console.log('=== API data 전체 ===');
-                console.log(response.data);
-                console.log('=== response.data 타입 ===');
-                console.log(typeof response.data);
-                console.log('=== response.data 키들 ===');
-                console.log(Object.keys(response.data || {}));
 
                 // 안전하게 데이터 접근
                 if (response && response.data) {
-                    console.log('=== 컨텐츠 리스트 ===');
-                    console.log(response.data.content);
-                    console.log('=== 첫 번째 아이템 구조 ===');
-                    if (response.data.content && response.data.content.length > 0) {
-                        const firstItem = response.data.content[0];
-                        console.log('첫 번째 아이템 전체:', firstItem);
-                        console.log('첫 번째 아이템 키들:', Object.keys(firstItem));
-                        console.log('googleRating:', firstItem.googleRating);
-                        console.log('googleRatingCount:', firstItem.googleRatingCount);
-                        console.log('rating:', firstItem.rating);
-                        console.log('ratingCount:', firstItem.ratingCount);
-                    }
-                    console.log('=== 페이지 정보 ===');
-                    console.log(response.data.page);
-
                     if (response.success && response.data.content) {
                         setDestinations(response.data.content);
                         console.log('=== 설정된 destinations ===');
@@ -80,7 +73,6 @@ const ContentList: NextPage = () => {
                 }
             } catch (err) {
                 console.error('Error fetching destinations:', err);
-                console.error('Error details:', err);
 
                 // HTML 응답이 온 경우 (ngrok 브라우저 경고 등)
                 if (err && typeof err === 'object' && 'response' in err) {
@@ -100,7 +92,7 @@ const ContentList: NextPage = () => {
         };
 
         fetchDestinations();
-    }, [authLoading, user, safeRegionName]);
+    }, [authLoading, user, safeRegionName, selectedFilter]);
 
     // 테스트용: 강제로 선택 상태 설정 (나중에 제거)
     useEffect(() => {
@@ -251,6 +243,25 @@ const ContentList: NextPage = () => {
                     />
 
                     <div className={styles.content}>
+                        {/* 필터 섹션 */}
+                        <div className={styles.filterContainer}>
+                            <button
+                                className={`${styles.filterButton} ${selectedFilter === null ? styles.active : ''}`}
+                                onClick={() => setSelectedFilter(null)}
+                            >
+                                전체
+                            </button>
+                            {CONTENT_TYPES.map(type => (
+                                <button
+                                    key={type.id}
+                                    className={`${styles.filterButton} ${selectedFilter === type.id ? styles.active : ''}`}
+                                    onClick={() => setSelectedFilter(type.id)}
+                                >
+                                    {type.name}
+                                </button>
+                            ))}
+                        </div>
+
                         {loading ? (
                             <div className={styles.loadingContainer}>
                                 <div className={styles.spinner}></div>
@@ -269,14 +280,14 @@ const ContentList: NextPage = () => {
                         ) : (
                             <div className={styles.destinationGrid}>
                                 {destinations.map((destination) => {
-                                    console.log('=== 개별 여행지 정보 ===');
-                                    console.log('ID:', destination.contentId);
-                                    console.log('제목:', destination.title);
-                                    console.log('이미지 URL:', destination.photoUrl);
-                                    console.log('평점:', destination.rating);
-                                    console.log('리뷰 수:', destination.ratingCount);
-                                    console.log('주소:', destination.address);
-                                    console.log('-------------------');
+                                    // console.log('=== 개별 여행지 정보 ===');
+                                    // console.log('ID:', destination.contentId);
+                                    // console.log('제목:', destination.title);
+                                    // console.log('이미지 URL:', destination.photoUrl);
+                                    // console.log('평점:', destination.rating);
+                                    // console.log('리뷰 수:', destination.ratingCount);
+                                    // console.log('주소:', destination.address);
+                                    // console.log('-------------------');
 
                                     return (
                                         <div

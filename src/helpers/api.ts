@@ -272,17 +272,36 @@ apiClient.interceptors.response.use(
     }
 );
 
-// 지역별 컨텐츠 조회 API
-export const getContentsByRegion = async (regionName: string): Promise<ContentsResponse> => {
+// 지역별 컨텐츠 조회 API (contentTypeId 옵션 추가)
+export const getContentsByRegion = async (regionName: string, contentTypeId?: number): Promise<ContentsResponse> => {
     try {
-        console.log('🌍 API 호출 - Region:', regionName);
+        const url = contentTypeId
+            ? `/api/v1/contents/regions/${regionName}?contentTypeId=${contentTypeId}`
+            : `/api/v1/contents/regions/${regionName}`;
+
+        console.log('🌍 API 호출 - Region:', regionName, 'ContentType:', contentTypeId || 'All');
 
         // apiClient를 사용하여 Authorization 헤더 자동 포함
-        const response = await apiClient.get(`/api/v1/contents/regions/${regionName}`);
+        const response = await apiClient.get(url);
 
         return response.data;
     } catch (error) {
         console.error('Error fetching contents by region:', error);
+        throw error;
+    }
+};
+
+// 타입별 컨텐츠 조회 API
+export const getContentsByType = async (contentTypeId: number): Promise<ContentsResponse> => {
+    try {
+        console.log('🏷️ API 호출 - ContentType:', contentTypeId);
+
+        // apiClient를 사용하여 Authorization 헤더 자동 포함
+        const response = await apiClient.get(`/api/v1/contents/places/type/${contentTypeId}`);
+
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching contents by type:', error);
         throw error;
     }
 };

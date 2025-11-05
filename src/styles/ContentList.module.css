@@ -8,11 +8,58 @@
 .content {
     padding: 20px;
     min-height: calc(100vh - 70px);
+    max-height: calc(100vh - 70px);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    position: relative;
+    overflow: hidden;
+}
+
+/* 필터 컨테이너 */
+.filterContainer {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.filterContainer::-webkit-scrollbar {
+    height: 6px;
+}
+
+.filterContainer::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.filterContainer::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+.filterButton {
+    padding: 8px 16px;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.filterButton:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.filterButton.active {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: white;
+    border-color: #FFD700;
 }
 
 .destinationGrid {
@@ -21,10 +68,11 @@
     gap: 20px;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 20px;
+    padding: 10px;
     scrollbar-width: thin;
     scrollbar-color: #00FFAA #f0f0f0;
     width: 100%;
+    flex: 1;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -57,9 +105,9 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 280px;
+    width: 240px;
     flex-shrink: 0;
-    height: 350px;
+    height: 280px;
 }
 
 .destinationCard:hover {
@@ -85,7 +133,7 @@
 
 .cardImage {
     width: 100%;
-    aspect-ratio: 1 / 0.9;
+    aspect-ratio: 1 / 0.7;
     background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
     display: flex;
     align-items: center;
@@ -145,19 +193,17 @@
 }
 
 .cardContent {
-    padding: 16px;
+    padding: 10px 12px;
     background: white;
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    min-height: 0;
 }
 
 
 
 .cardTitle {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: #333;
     margin: 0;
@@ -200,7 +246,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-top: 0;
+    margin-top: 3px;
 }
 
 .rating {
@@ -425,7 +471,7 @@
 
     .destinationCard {
         width: 250px;
-        height: 350px;
+        height: 300px;
     }
 
     .cardImage {
@@ -482,7 +528,7 @@
 
     .destinationCard {
         width: 200px;
-        height: 280px;
+        height: 100%;
         flex-shrink: 0;
     }
 
