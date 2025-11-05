@@ -23,6 +23,7 @@ const Record: NextPage = () => {
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // tripId를 안전하게 처리
@@ -163,6 +164,16 @@ const Record: NextPage = () => {
         }
     };
 
+    // 사진 클릭 (모달 열기)
+    const handlePhotoClick = (photo: Photo) => {
+        setSelectedPhoto(photo);
+    };
+
+    // 모달 닫기
+    const handleCloseModal = () => {
+        setSelectedPhoto(null);
+    };
+
     // 사진 삭제하기
     const handleDeletePhoto = async (photoId: string) => {
         if (!safeTripId) return;
@@ -172,6 +183,7 @@ const Record: NextPage = () => {
         try {
             await deletePhoto(safeTripId, photoId);
             console.log('✅ 사진 삭제 성공');
+            setSelectedPhoto(null); // 모달 닫기
             await refreshPhotos();
         } catch (error) {
             console.error('❌ 사진 삭제 실패:', error);
@@ -254,23 +266,16 @@ const Record: NextPage = () => {
                         {!loading && !error && photos.length > 0 && (
                             <div className={styles.photoGallery}>
                                 {photos.map((photo) => (
-                                    <div key={photo.id} className={styles.photoCard}>
+                                    <div
+                                        key={photo.id}
+                                        className={styles.photoCard}
+                                        onClick={() => handlePhotoClick(photo)}
+                                    >
                                         <img
-                                            src={photo.thumbnailUrl || photo.url}
+                                            src={`/api/image-proxy?url=${encodeURIComponent(photo.thumbnailUrl || photo.url)}`}
                                             alt={photo.fileName}
                                             className={styles.photoImage}
                                         />
-                                        <div className={styles.photoOverlay}>
-                                            <button
-                                                className={styles.deleteButton}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeletePhoto(photo.id);
-                                                }}
-                                            >
-                                                🗑️
-                                            </button>
-                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -284,6 +289,35 @@ const Record: NextPage = () => {
                             </div>
                         )}
                     </div>
+
+                    {/* 사진 모달 */}
+                    {selectedPhoto && (
+                        <div className={styles.photoModal} onClick={handleCloseModal}>
+                            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                                <div className={styles.modalHeader}>
+                                    <span className={styles.modalFileName}>{selectedPhoto.fileName}</span>
+                                    <button className={styles.modalCloseButton} onClick={handleCloseModal}>
+                                        ✕
+                                    </button>
+                                </div>
+                                <div className={styles.modalImageContainer}>
+                                    <img
+                                        src={`/api/image-proxy?url=${encodeURIComponent(selectedPhoto.url)}`}
+                                        alt={selectedPhoto.fileName}
+                                        className={styles.modalImage}
+                                    />
+                                </div>
+                                <div className={styles.modalFooter}>
+                                    <button
+                                        className={styles.modalDeleteButton}
+                                        onClick={() => handleDeletePhoto(selectedPhoto.id)}
+                                    >
+                                        🗑️ 삭제하기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* 숨겨진 파일 입력 */}
                     <input
