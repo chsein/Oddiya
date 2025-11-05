@@ -1,41 +1,32 @@
-import { AbsoluteFill, Audio, Img, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, Img, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import { useMemo, useState, useEffect } from 'react';
 import { z } from "zod";
 import { CompositionProps } from "../../types/constants";
 
 const timingData = {
     beat_times: [
-        0.05,
-        0.45,
-        0.87,
-        1.7,
+        0.13,
+        1.00, 1.20, 1.28, 1.40, 1.60,
         2.1,
-        2.94,
-        3.36,
-        4.18,
-        4.6,
-        5.42,
-        5.83,
-        6.66,
-        7.08,
-        7.91,
-        8.31,
-        8.73,
-        9.56,
-        9.97,
-        10.8,
-        11.22,
-        12.04,
-        12.46,
-        13.28,
-        13.7,
-        14.52,
-        14.98,
-        15.87
+        2.78, 3.25, 3.29, 3.50,
+        4.1,
+        5.10, 5.40, 5.70,
+        6.12,
+        7.00, 7.60, 7.9,
+        8.30,
+        8.70, 8.90, 9.60, 9.81, 10.00,
+        10.50,
+        11.08, 11.42, 11.90, 12.65,
+        13.16,
+        13.71,
+        14.19,
+        14.74,
+        15.25,
+        16.05
     ],
 };
 
-// single 레이아웃 제거 - 모든 비트를 grid 또는 coords로 사용
+const singleBeatIndices = new Set([0, 6, 11, 15, 19, 25]); // 무조건 한장이 나와야 하는 인덱스
 
 function getSeededRandomInt(seed: number, min: number, max: number) {
     const x = Math.sin(seed) * 10000;
@@ -44,37 +35,54 @@ function getSeededRandomInt(seed: number, min: number, max: number) {
 }
 
 function decideLayoutType(seed: number, last: string | null, lastWasGrid: boolean): 'grid' | 'coords' {
-    // 랜덤하게 grid 또는 coords 선택
+    // 그리드 다음에는 무조건 싱글이 와야 하므로 coords만 가능
+    if (lastWasGrid) {
+        return 'coords';
+    }
+
     const candidate = getSeededRandomInt(seed, 0, 1) === 0 ? 'grid' : 'coords';
-    return candidate;
+    return candidate === last ? (candidate === 'grid' ? 'coords' : 'grid') : candidate;
 }
 
 export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof CompositionProps>) => {
     const frame = useCurrentFrame();
     const { fps, width, height } = useVideoConfig();
 
+    // images 안전성 체크
+    const safeImages = Array.isArray(images) ? images : [];
+
+    console.log('🎬 BeatVideo props:', {
+        title,
+        imagesCount: safeImages.length,
+        music,
+        tripId,
+        images: safeImages.slice(0, 3) // 처음 3개만 로그
+    });
+
     // 매번 다른 시드를 생성하기 위해 useState 사용
     const [randomSeed, setRandomSeed] = useState(() => {
-        const imageHash = images?.reduce((acc, img) => acc + (img.url || '').length, 0) || 0;
+        const imageHash = safeImages.reduce((acc, img) => acc + (img?.url || '').length, 0);
         return Date.now() + Math.random() * 1000 + (tripId ? tripId.toString().length : 0) + imageHash;
     });
 
     // 컴포넌트가 마운트될 때마다 새로운 시드 생성
     useEffect(() => {
-        const imageHash = images?.reduce((acc, img) => acc + (img.url || '').length, 0) || 0;
+        const imageHash = safeImages.reduce((acc, img) => acc + (img?.url || '').length, 0);
         setRandomSeed(Date.now() + Math.random() * 1000 + (tripId ? tripId.toString().length : 0) + imageHash);
-    }, [tripId, images?.length]);
-
+    }, [tripId, safeImages.length]);
 
     const renderItems = useMemo(() => {
-        if (!images || images.length === 0) return [];
+        if (!safeImages || safeImages.length === 0) {
+            console.log('⚠️ No images available for BeatVideo');
+            return [];
+        }
 
         let lastLayout: 'grid' | 'coords' | null = null;
         let lastWasGrid = false;
         const usedImages = new Set<number>(); // 전체 비디오에서 사용된 이미지 인덱스 추적
         const items: Array<{
             groupIndex: number;
-            layout: 'gridImage' | 'coordsImage';
+            layout: 'single' | 'gridImage' | 'coordsImage';
             imgIndex: number;
             coordsPos?: { left: number; top: number; widthPercent: number; heightPercent: number };
             gridIdx?: number;
@@ -86,15 +94,15 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
         // 사용 가능한 이미지 중에서 선택하는 함수
         const getAvailableImageIndex = (orientation?: 'landscape' | 'portrait'): number => {
             let availableImages = orientation
-                ? images.filter((img, idx) => img.orientation === orientation && !usedImages.has(idx))
-                : images.filter((_, idx) => !usedImages.has(idx));
+                ? safeImages.filter((img, idx) => img?.orientation === orientation && !usedImages.has(idx))
+                : safeImages.filter((_, idx) => !usedImages.has(idx));
 
             // 모든 이미지가 사용되었다면 사용 기록을 초기화
             if (availableImages.length === 0) {
                 usedImages.clear();
                 availableImages = orientation
-                    ? images.filter(img => img.orientation === orientation)
-                    : images;
+                    ? safeImages.filter(img => img?.orientation === orientation)
+                    : safeImages;
             }
 
             // 최근 사용된 이미지들과의 거리를 고려하여 선택
@@ -103,7 +111,7 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
             if (recentUsed.length > 0 && availableImages.length > 1) {
                 // 최근 사용된 이미지와 거리가 먼 이미지 우선 선택
                 const distances = availableImages.map((img, idx) => {
-                    const originalIndex = images.indexOf(img);
+                    const originalIndex = safeImages.indexOf(img);
                     const minDistance = Math.min(...recentUsed.map(used => Math.abs(originalIndex - used)));
                     return { img, originalIndex, distance: minDistance };
                 });
@@ -121,7 +129,7 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
             // 일반적인 랜덤 선택
             const randomIndex = Math.floor(Math.random() * availableImages.length);
             const selectedImage = availableImages[randomIndex];
-            const originalIndex = images.indexOf(selectedImage);
+            const originalIndex = safeImages.indexOf(selectedImage);
             usedImages.add(originalIndex);
             return originalIndex;
         };
@@ -131,16 +139,40 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
 
         while (beatIdx < timingData.beat_times.length) {
             const groupIndex = beatIdx;
-            let layoutType: 'grid' | 'coords';
+            let layoutType: 'single' | 'grid' | 'coords';
 
-            // 모든 비트를 grid 또는 coords로 결정
-            layoutType = decideLayoutType(groupIndex * 99 + randomSeed, lastLayout, lastWasGrid);
-            console.log(`🎲 Beat ${groupIndex}: layout: ${layoutType}, lastLayout: ${lastLayout}, lastWasGrid: ${lastWasGrid}`);
+            if (singleBeatIndices.has(groupIndex)) {
+                // 무조건 한장이 나와야 하는 인덱스: single 또는 coords 한장
+                const shouldBeSingle = getSeededRandomInt(groupIndex * 99 + randomSeed, 0, 1) === 0;
+                layoutType = shouldBeSingle ? 'single' : 'coords';
+                console.log(`🎯 Single beat index ${groupIndex}: layoutType = ${layoutType}`);
+            } else {
+                layoutType = decideLayoutType(groupIndex * 99 + randomSeed, lastLayout, lastWasGrid);
+                console.log(`🎲 Beat ${groupIndex}: layout: ${layoutType}, lastLayout: ${lastLayout}, lastWasGrid: ${lastWasGrid}`);
+            }
 
             layoutTypes.push(layoutType);
 
-            lastLayout = layoutType;
-            lastWasGrid = layoutType === 'grid';
+            if (layoutType !== 'single') {
+                lastLayout = layoutType;
+                lastWasGrid = layoutType === 'grid';
+            } else {
+                lastWasGrid = false;
+            }
+
+            const startFrame = Math.floor(timingData.beat_times[beatIdx] * fps);
+
+            if (layoutType === 'single') {
+                items.push({
+                    groupIndex,
+                    layout: 'single',
+                    imgIndex: getAvailableImageIndex('landscape'), // 가로가 긴 사진만 선택
+                    zIndex: groupIndex,
+                    startFrame,
+                });
+                beatIdx += 1;
+                continue;
+            }
 
             if (layoutType === 'grid') {
                 const gridType = getSeededRandomInt(groupIndex * 456, 0, 1) === 0 ? '2x2' : '1x4';
@@ -151,7 +183,8 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
                 const gridImages: number[] = [];
                 for (let i = 0; i < count; i++) {
                     if (beatIdx + i >= timingData.beat_times.length) break;
-                    gridImages.push(getAvailableImageIndex()); // 모든 이미지 사용 가능
+                    const orientation = gridType === '2x2' ? 'landscape' : 'portrait';
+                    gridImages.push(getAvailableImageIndex(orientation));
                 }
 
                 // 이미지 순서를 랜덤하게 섞기
@@ -164,7 +197,7 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
                         layout: 'gridImage',
                         imgIndex: shuffledGridImages[i], // 랜덤하게 섞인 이미지 사용
                         zIndex: groupIndex,
-                        startFrame: Math.floor(timingData.beat_times[beatIdx] * fps), // 그룹의 첫 번째 비트 시간 사용
+                        startFrame: Math.floor(timingData.beat_times[beatIdx + i] * fps),
                         gridIdx: i,
                         gridType,
                     });
@@ -174,42 +207,46 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
             }
 
             // coords layout
-            const count = getSeededRandomInt(groupIndex * 123, 2, 4); // 2-4장으로 늘림
+            const count = singleBeatIndices.has(groupIndex) ? 1 : getSeededRandomInt(groupIndex * 123, 1, 2); // 특정 인덱스는 무조건 1장
             console.log(`🎯 Coords layout - count: ${count}, groupIndex: ${groupIndex}`);
 
             let coordsPositions;
 
-            if (count === 2) {
-                // 두장: 대각선 배치
-                coordsPositions = [
-                    { left: 25, top: 30, widthPercent: 40, heightPercent: 50 },
-                    { left: 75, top: 70, widthPercent: 40, heightPercent: 50 },
-                ];
-            } else if (count === 3) {
-                // 세장: 삼각형 배치
-                coordsPositions = [
-                    { left: 50, top: 20, widthPercent: 35, heightPercent: 40 },
-                    { left: 25, top: 70, widthPercent: 35, heightPercent: 40 },
-                    { left: 75, top: 70, widthPercent: 35, heightPercent: 40 },
-                ];
+            if (count === 1) {
+                // 중간 한장: 세로가 긴 사진은 세로 크기 살짝 작게, 가로가 긴 사진은 가로 크기 4/7
+                const isPortrait = getSeededRandomInt(groupIndex * 789, 0, 1) === 0;
+                if (isPortrait) {
+                    coordsPositions = [{
+                        left: 50,
+                        top: 50,
+                        widthPercent: 70,
+                        heightPercent: 85
+                    }];
+                } else {
+                    coordsPositions = [{
+                        left: 50,
+                        top: 50,
+                        widthPercent: 57, // 4/7 ≈ 57%
+                        heightPercent: 100
+                    }];
+                }
             } else {
-                // 네장: 사각형 배치
+                // 대각선 두장: 가로가 긴 사진, 세로 크기 4/7, 비율 유지하며 패딩
                 coordsPositions = [
-                    { left: 25, top: 25, widthPercent: 35, heightPercent: 35 },
-                    { left: 75, top: 25, widthPercent: 35, heightPercent: 35 },
-                    { left: 25, top: 75, widthPercent: 35, heightPercent: 35 },
-                    { left: 75, top: 75, widthPercent: 35, heightPercent: 35 },
+                    { left: 25, top: 30, widthPercent: 80, heightPercent: 50 }, // 위쪽 여백 추가
+                    { left: 75, top: 70, widthPercent: 80, heightPercent: 50 }, // 아래쪽 여백 추가
                 ];
             }
 
             for (let i = 0; i < count; i++) {
                 if (beatIdx + i >= timingData.beat_times.length) break;
+                const orientation = count === 2 ? 'landscape' : undefined; // 대각선 두장일 때만 가로가 긴 사진 제한
                 items.push({
                     groupIndex,
                     layout: 'coordsImage',
-                    imgIndex: getAvailableImageIndex(), // 모든 이미지 사용 가능
+                    imgIndex: getAvailableImageIndex(orientation), // 사용되지 않은 이미지 중에서 선택
                     zIndex: groupIndex,
-                    startFrame: Math.floor(timingData.beat_times[beatIdx] * fps), // 그룹의 첫 번째 비트 시간 사용
+                    startFrame: Math.floor(timingData.beat_times[beatIdx + i] * fps),
                     coordsPos: coordsPositions[i],
                 });
             }
@@ -218,6 +255,7 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
 
         // 디버깅: 레이아웃 분포 확인
         console.log('🎬 BeatVideo Layout Types:', layoutTypes);
+        console.log('📊 Single count:', layoutTypes.filter(t => t === 'single').length);
         console.log('📊 Grid count:', layoutTypes.filter(t => t === 'grid').length);
         console.log('📊 Coords count:', layoutTypes.filter(t => t === 'coords').length);
         console.log('🎲 Random Seed:', randomSeed);
@@ -230,22 +268,43 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
         })));
 
         return items;
-    }, [fps, images, randomSeed]);
+    }, [fps, safeImages, randomSeed]);
 
     return (
         <AbsoluteFill style={{ backgroundColor: 'black' }}>
             {/* 배경 음악이 있다면 재생 */}
-            {music && <Audio src={music} />}
+            {music && <Audio src={staticFile('../public/music.mp3')} />}
 
             {(() => {
                 // 디버깅: 현재 프레임에서 렌더링될 아이템들 필터링
                 const visibleItems = renderItems.filter(item => frame >= item.startFrame);
-                console.log(`🎬 Frame ${frame}: 총 ${renderItems.length}개 아이템 중 ${visibleItems.length}개 렌더링`);
+                // console.log(`🎬 Frame ${frame}: 총 ${renderItems.length}개 아이템 중 ${visibleItems.length}개 렌더링`);
 
                 return renderItems.map((item, i) => {
                     if (frame < item.startFrame) return null;
 
-                    const src = images[item.imgIndex]?.url || '';
+                    const src = safeImages[item.imgIndex]?.url || '';
+
+                    if (item.layout === 'single') {
+                        return (
+                            <Img
+                                key={`single-${item.groupIndex}`}
+                                src={src}
+                                style={{
+                                    position: 'absolute',
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    objectPosition: 'center 25%',
+                                    borderRadius: 0,
+                                    border: 'none',
+                                    outline: 'none',
+                                    zIndex: item.zIndex,
+                                }}
+                                draggable={false}
+                            />
+                        );
+                    }
 
                     if (item.layout === 'gridImage') {
                         const gridType = item.gridType || '2x2';
@@ -275,14 +334,13 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
                                     position: 'absolute',
                                     width: sizeW,
                                     height: sizeH,
-                                    left: left,
-                                    top: top,
-                                    objectFit: 'contain',
-                                    objectPosition: 'center',
+                                    top,
+                                    left,
+                                    objectFit: 'cover',
+                                    objectPosition: 'center 25%',
                                     borderRadius: 0,
                                     border: 'none',
                                     outline: 'none',
-                                    backgroundColor: 'black',
                                     zIndex: item.zIndex,
                                 }}
                                 draggable={false}
@@ -292,26 +350,22 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
 
                     if (item.layout === 'coordsImage') {
                         const { left = 50, top = 50, widthPercent = 50, heightPercent = 50 } = item.coordsPos || {};
-                        const pixelWidth = (width * widthPercent) / 100;
-                        const pixelHeight = (height * heightPercent) / 100;
-                        const pixelLeft = (width * left) / 100;
-                        const pixelTop = (height * top) / 100;
-
                         return (
                             <Img
                                 key={`coords-${item.groupIndex}-${item.imgIndex}`}
                                 src={src}
                                 style={{
                                     position: 'absolute',
-                                    width: pixelWidth,
-                                    height: pixelHeight,
-                                    top: pixelTop - pixelHeight / 2,
-                                    left: pixelLeft - pixelWidth / 2,
+                                    width: `${widthPercent}%`,
+                                    height: `${heightPercent}%`,
+                                    top: `${top}%`,
+                                    left: `${left}%`,
+                                    transform: 'translate(-50%, -50%)',
                                     objectFit: 'contain',
                                     borderRadius: 0,
                                     border: 'none',
                                     outline: 'none',
-                                    backgroundColor: 'black',
+                                    backgroundColor: 'transparent',
                                     zIndex: item.zIndex,
                                 }}
                                 draggable={false}

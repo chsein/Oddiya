@@ -195,21 +195,19 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
 }
 
 .modalContent {
-    background: white;
-    border-radius: 20px;
+    position: relative;
     max-width: 90vw;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    border: 3px solid #333;
     animation: slideUp 0.3s ease;
 }
 
@@ -218,6 +216,7 @@
         transform: translateY(50px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -243,76 +242,79 @@
     max-width: calc(100% - 60px);
 }
 
-.modalCloseButton {
-    background: #333;
-    color: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-}
-
-.modalCloseButton:hover {
-    background: #555;
-    transform: scale(1.1);
-}
-
 .modalImageContainer {
+    position: relative;
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: auto;
-    background: #f5f5f5;
-    padding: 20px;
+    background: transparent;
+    padding: 0;
 }
 
 .modalImage {
-    max-width: 100%;
-    max-height: 70vh;
+    max-width: 90vw;
+    max-height: 90vh;
     object-fit: contain;
     border-radius: 10px;
 }
 
-.modalFooter {
+.modalCloseButton {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.8rem;
+    cursor: pointer;
     display: flex;
+    align-items: center;
     justify-content: center;
-    padding: 20px;
-    background: white;
-    border-top: 2px solid #333;
+    transition: all 0.3s ease;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+}
+
+.modalCloseButton:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
 }
 
 .modalDeleteButton {
-    background: #ff4757;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 71, 87, 0.95);
     color: white;
-    border: 2px solid #333;
-    padding: 12px 30px;
-    border-radius: 15px;
-    font-size: 1.1rem;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    padding: 14px 35px;
+    border-radius: 25px;
+    font-size: 1.2rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+    z-index: 10;
+    backdrop-filter: blur(5px);
 }
 
 .modalDeleteButton:hover {
-    background: #ff3742;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 71, 87, 0.4);
+    background: rgba(255, 55, 66, 0.98);
+    transform: translateX(-50%) translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5);
 }
 
 .modalDeleteButton:active {
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(-1px);
 }
 
 /* 에러 메시지 스타일 */
@@ -468,38 +470,25 @@
     .modalContent {
         max-width: 95vw;
         max-height: 95vh;
-        border-radius: 15px;
-    }
-
-    .modalHeader {
-        padding: 15px;
-    }
-
-    .modalFileName {
-        font-size: 1rem;
-    }
-
-    .modalCloseButton {
-        width: 35px;
-        height: 35px;
-        font-size: 1.3rem;
-    }
-
-    .modalImageContainer {
-        padding: 15px;
     }
 
     .modalImage {
-        max-height: 60vh;
+        max-width: 95vw;
+        max-height: 95vh;
     }
 
-    .modalFooter {
-        padding: 15px;
+    .modalCloseButton {
+        width: 45px;
+        height: 45px;
+        font-size: 1.6rem;
+        top: 15px;
+        right: 15px;
     }
 
     .modalDeleteButton {
-        padding: 10px 25px;
-        font-size: 1rem;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+        bottom: 25px;
     }
 }
 
@@ -543,38 +532,25 @@
     .modalContent {
         max-width: 98vw;
         max-height: 98vh;
-        border-radius: 12px;
-    }
-
-    .modalHeader {
-        padding: 12px;
-    }
-
-    .modalFileName {
-        font-size: 0.9rem;
-    }
-
-    .modalCloseButton {
-        width: 32px;
-        height: 32px;
-        font-size: 1.2rem;
-    }
-
-    .modalImageContainer {
-        padding: 10px;
     }
 
     .modalImage {
-        max-height: 55vh;
+        max-width: 98vw;
+        max-height: 98vh;
     }
 
-    .modalFooter {
-        padding: 12px;
+    .modalCloseButton {
+        width: 40px;
+        height: 40px;
+        font-size: 1.4rem;
+        top: 10px;
+        right: 10px;
     }
 
     .modalDeleteButton {
-        padding: 8px 20px;
-        font-size: 0.9rem;
+        padding: 10px 25px;
+        font-size: 1rem;
+        bottom: 20px;
     }
 }
 
@@ -629,37 +605,24 @@
     .modalContent {
         max-width: 95vw;
         max-height: 90vh;
-        border-radius: 12px;
-    }
-
-    .modalHeader {
-        padding: 10px 15px;
-    }
-
-    .modalFileName {
-        font-size: 0.9rem;
-    }
-
-    .modalCloseButton {
-        width: 30px;
-        height: 30px;
-        font-size: 1.1rem;
-    }
-
-    .modalImageContainer {
-        padding: 10px;
     }
 
     .modalImage {
-        max-height: 50vh;
+        max-width: 95vw;
+        max-height: 90vh;
     }
 
-    .modalFooter {
-        padding: 10px;
+    .modalCloseButton {
+        width: 38px;
+        height: 38px;
+        font-size: 1.3rem;
+        top: 10px;
+        right: 10px;
     }
 
     .modalDeleteButton {
-        padding: 6px 18px;
-        font-size: 0.85rem;
+        padding: 8px 22px;
+        font-size: 0.95rem;
+        bottom: 15px;
     }
 }

@@ -294,19 +294,15 @@ const Record: NextPage = () => {
                     {selectedPhoto && (
                         <div className={styles.photoModal} onClick={handleCloseModal}>
                             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                                <div className={styles.modalHeader}>
-                                    <button className={styles.modalCloseButton} onClick={handleCloseModal}>
-                                        ✕
-                                    </button>
-                                </div>
                                 <div className={styles.modalImageContainer}>
                                     <img
                                         src={`/api/image-proxy?url=${encodeURIComponent(selectedPhoto.url)}`}
                                         alt={selectedPhoto.fileName}
                                         className={styles.modalImage}
                                     />
-                                </div>
-                                <div className={styles.modalFooter}>
+                                    <button className={styles.modalCloseButton} onClick={handleCloseModal}>
+                                        ✕
+                                    </button>
                                     <button
                                         className={styles.modalDeleteButton}
                                         onClick={() => handleDeletePhoto(selectedPhoto.id)}
