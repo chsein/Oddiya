@@ -463,3 +463,140 @@ export const generateItinerary = async (tripId: string, placeIds: string[]): Pro
         throw error;
     }
 };
+
+// ========== Photo API ==========
+
+// Photo 관련 타입 정의
+export interface PhotoUploadUrlRequest {
+    fileName: string;
+    fileType: string;  // MIME type (image/jpeg, image/png, etc.)
+    fileSize: number;  // bytes
+    takenAt?: string;  // ISO 8601 format
+    latitude?: number;
+    longitude?: number;
+}
+
+export interface PhotoUploadUrlResponse {
+    photoId: string;
+    uploadUrl: string;  // Pre-signed URL (15분 유효)
+    expiresAt: string;  // ISO 8601 format
+    s3Key: string;
+}
+
+export interface Photo {
+    id: string;
+    url: string;  // Pre-signed download URL (1시간 유효)
+    thumbnailUrl?: string;
+    fileName: string;
+    fileSize: number;
+    width?: number;
+    height?: number;
+    latitude?: number;
+    longitude?: number;
+    locationName?: string;
+    takenAt?: string;
+    createdAt: string;
+    status: string;  // PENDING, UPLOADED, PROCESSING, PROCESSED, FAILED
+}
+
+export interface PhotoListResponse {
+    content: Photo[];
+    pageable: any;
+    totalElements: number;
+    totalPages: number;
+    last: boolean;
+    first: boolean;
+}
+
+// 1. Pre-signed URL 요청
+export const requestPhotoUploadUrl = async (
+    tripId: string,
+    request: PhotoUploadUrlRequest
+): Promise<PhotoUploadUrlResponse> => {
+    try {
+        const response = await apiClient.post(`/api/v1/trips/${tripId}/photos/upload-url`, request);
+        console.log('📸 Pre-signed URL 생성 성공:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error requesting photo upload URL:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// 2. S3/MinIO에 직접 업로드 (Pre-signed URL 사용)
+export const uploadPhotoToS3 = async (
+    uploadUrl: string,
+    file: File,
+    contentType: string
+): Promise<void> => {
+    try {
+        // axios로 PUT 요청 (별도 인스턴스, Authorization 헤더 제외)
+        await axios.put(uploadUrl, file, {
+            headers: {
+                'Content-Type': contentType,
+            },
+        });
+        console.log('📸 S3 업로드 성공:', file.name);
+    } catch (error) {
+        console.error('Error uploading photo to S3:', error);
+        throw error;
+    }
+};
+
+// 3. 업로드 확인
+export const confirmPhotoUpload = async (
+    tripId: string,
+    photoId: string
+): Promise<void> => {
+    try {
+        await apiClient.post(`/api/v1/trips/${tripId}/photos/${photoId}/confirm`);
+        console.log('📸 업로드 확인 성공:', photoId);
+    } catch (error) {
+        console.error('Error confirming photo upload:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// 4. 사진 목록 조회
+export const getPhotos = async (
+    tripId: string,
+    page: number = 0,
+    size: number = 20
+): Promise<PhotoListResponse> => {
+    try {
+        const response = await apiClient.get(`/api/v1/trips/${tripId}/photos`, {
+            params: { page, size }
+        });
+        console.log('📸 사진 목록 조회 성공:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching photos:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// 5. 사진 삭제
+export const deletePhoto = async (
+    tripId: string,
+    photoId: string
+): Promise<void> => {
+    try {
+        await apiClient.delete(`/api/v1/trips/${tripId}/photos/${photoId}`);
+        console.log('📸 사진 삭제 성공:', photoId);
+    } catch (error) {
+        console.error('Error deleting photo:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
