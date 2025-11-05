@@ -48,6 +48,24 @@ body {
   height: 100%;
 }
 
+/* 가로모드에서 스크롤 방지 및 화면 고정 */
+@media (max-height: 500px) and (orientation: landscape) {
+
+  html,
+  body {
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+  }
+
+  #__next {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+}
+
 body {
   background-color: var(--background);
   font-family: var(--geist-font);

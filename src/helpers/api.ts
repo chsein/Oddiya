@@ -43,16 +43,50 @@ export interface ContentsResponse {
 }
 
 // ContentDetail 관련 타입 정의
+export interface Time {
+    hour: number;
+    minute: number;
+    second: number;
+    nano: number;
+}
+
+export interface OpeningHours {
+    id: string;
+    dayOfWeek: number;
+    openTime: Time;
+    closeTime: Time;
+    isClosed: boolean;
+    is24Hours: boolean;
+    breakTimeStart: Time;
+    breakTimeEnd: Time;
+    secondBreakStart: Time;
+    secondBreakEnd: Time;
+    lastOrderTime: Time;
+    lastEntryTime: Time;
+    specialType: string;
+    specialDate: string;
+    specialNotes: string;
+    dataSource: string;
+    confidenceScore: number;
+    isVerified: boolean;
+}
+
 export interface Photo {
-    id: number;
+    id: string;
     photoUrl: string;
     photoReference: string;
+    widthPx: number;
+    heightPx: number;
     photoSource: string;
     isPrimary: boolean;
+    caption: string;
+    attribution: string;
+    photographer: string;
+    qualityScore: number;
 }
 
 export interface Review {
-    id: number;
+    id: string;
     reviewText: string;
     rating: number;
     authorName: string;
@@ -60,6 +94,14 @@ export interface Review {
     reviewTime: string;
     relativeTimeDescription: string;
     languageCode: string;
+    reviewSource: string;
+    isTranslated: boolean;
+    translatedText: string;
+    sentimentScore: number;
+    sentiment: string;
+    isVerified: boolean;
+    helpfulVotes: number;
+    totalVotes: number;
 }
 
 export interface DetailInfo {
@@ -72,29 +114,52 @@ export interface DetailInfo {
 }
 
 export interface ContentDetail {
+    id: string;
     contentId: string;
+    googlePlaceId: string;
     contentTypeId: string;
-    contentTypeName: string;
     title: string;
+    overview: string;
     addr1: string;
     addr2: string;
+    tel: string;
+    homepage: string;
     areaCode: string;
     sigunguCode: string;
     latitude: number;
     longitude: number;
-    overview: string;
+    plusCode: string;
     firstImage: string;
-    googlePlaceId: string;
     rating: number;
     reviewCount: number;
-    photos: Photo[];
-    reviews: Review[];
-    openingHours: any[];
-    detailInfoJson: DetailInfo[];
+    googleRating: number;
+    googleRatingCount: number;
+    priceLevel: number;
+    editorialSummary: string;
+    generativeSummary: string;
+    goodForChildren: boolean;
+    allowsDogs: boolean;
+    restroom: boolean;
+    wheelchairAccessibleEntrance: boolean;
+    wheelchairAccessibleRestroom: boolean;
+    wheelchairAccessibleParking: boolean;
+    freeParkingLot: boolean;
+    paidParkingLot: boolean;
+    acceptsCreditCards: boolean;
+    acceptsContactlessPayment: boolean;
+    businessStatus: string;
     dataQuality: string;
     lastUpdated: string;
-    createdAt: string;
-    updatedAt: string;
+    detailInfoJson: any; // 객체 또는 배열일 수 있음
+    photos: Photo[];
+    reviews: Review[];
+    openingHours: OpeningHours[];
+    detailIntro: any;
+    fullAddress: string;
+    // 하위 호환성을 위한 필드들 (옵셔널)
+    contentTypeName?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface ContentDetailResponse {
@@ -102,6 +167,7 @@ export interface ContentDetailResponse {
     data: ContentDetail;
     message: string;
     timestamp: string;
+    error?: string;
 }
 
 // Trip 관련 타입 정의

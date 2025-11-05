@@ -42,9 +42,61 @@ const ContentDetail: NextPage = () => {
                 console.log(response.data);
 
                 if (response.success) {
-                    setDestination(response.data);
-                    console.log('=== 설정된 destination ===');
-                    console.log(response.data);
+                    const dest = response.data;
+                    setDestination(dest);
+
+                    // destination의 모든 필드를 개별적으로 출력
+                    console.log('=== 설정된 destination 상세 정보 ===');
+                    console.log('id:', dest.id);
+                    console.log('contentId:', dest.contentId);
+                    console.log('googlePlaceId:', dest.googlePlaceId);
+                    console.log('contentTypeId:', dest.contentTypeId);
+                    console.log('title:', dest.title);
+                    console.log('overview:', dest.overview);
+                    console.log('addr1:', dest.addr1);
+                    console.log('addr2:', dest.addr2);
+                    console.log('tel:', dest.tel);
+                    console.log('homepage:', dest.homepage);
+                    console.log('areaCode:', dest.areaCode);
+                    console.log('sigunguCode:', dest.sigunguCode);
+                    console.log('latitude:', dest.latitude);
+                    console.log('longitude:', dest.longitude);
+                    console.log('plusCode:', dest.plusCode);
+                    console.log('firstImage:', dest.firstImage);
+                    console.log('rating:', dest.rating);
+                    console.log('reviewCount:', dest.reviewCount);
+                    console.log('googleRating:', dest.googleRating);
+                    console.log('googleRatingCount:', dest.googleRatingCount);
+                    console.log('priceLevel:', dest.priceLevel);
+                    console.log('editorialSummary:', dest.editorialSummary);
+                    console.log('generativeSummary:', dest.generativeSummary);
+                    console.log('goodForChildren:', dest.goodForChildren);
+                    console.log('allowsDogs:', dest.allowsDogs);
+                    console.log('restroom:', dest.restroom);
+                    console.log('wheelchairAccessibleEntrance:', dest.wheelchairAccessibleEntrance);
+                    console.log('wheelchairAccessibleRestroom:', dest.wheelchairAccessibleRestroom);
+                    console.log('wheelchairAccessibleParking:', dest.wheelchairAccessibleParking);
+                    console.log('freeParkingLot:', dest.freeParkingLot);
+                    console.log('paidParkingLot:', dest.paidParkingLot);
+                    console.log('acceptsCreditCards:', dest.acceptsCreditCards);
+                    console.log('acceptsContactlessPayment:', dest.acceptsContactlessPayment);
+                    console.log('businessStatus:', dest.businessStatus);
+                    console.log('dataQuality:', dest.dataQuality);
+                    console.log('lastUpdated:', dest.lastUpdated);
+                    console.log('detailInfoJson:', dest.detailInfoJson);
+                    console.log('detailIntro:', dest.detailIntro);
+                    console.log('fullAddress:', dest.fullAddress);
+                    console.log('contentTypeName:', dest.contentTypeName);
+                    console.log('createdAt:', dest.createdAt);
+                    console.log('updatedAt:', dest.updatedAt);
+                    console.log('photos 배열 길이:', dest.photos?.length || 0);
+                    console.log('photos:', dest.photos);
+                    console.log('reviews 배열 길이:', dest.reviews?.length || 0);
+                    console.log('reviews:', dest.reviews);
+                    console.log('openingHours 배열 길이:', dest.openingHours?.length || 0);
+                    console.log('openingHours:', dest.openingHours);
+                    console.log('=== destination 전체 객체 ===');
+                    console.log(dest);
                 } else {
                     setError('데이터를 불러오는데 실패했습니다.');
                 }
@@ -207,7 +259,7 @@ const ContentDetail: NextPage = () => {
     return (
         <div>
             <Head>
-                <title>{destination.title} - ODDIYA</title>
+                <title>{destination.title}</title>
                 <meta name="description" content={destination.overview} />
                 <meta
                     name="viewport"
@@ -263,56 +315,107 @@ const ContentDetail: NextPage = () => {
                                 {destination.overview}
                             </div>
 
-                            <div className={styles.featuresGrid}>
-                                {/* 평점 카드 */}
-                                <div
-                                    className={styles.featureCard}
-                                    onClick={() => setShowReviewModal(true)}
-                                    style={{ cursor: 'pointer' }}
-                                >
-                                    <div className={styles.ratingText}>
-                                        ⭐ {(destination.rating || 0).toFixed(1)}
-                                    </div>
-                                    <div className={styles.ratingSubText}>
-                                        ({(destination.reviewCount || 0)}개 리뷰)
-                                    </div>
-                                </div>
+                            {/* 편의시설 필드 중 true인 것들 체크 */}
+                            {(() => {
+                                const facilityFields = [
+                                    { key: 'goodForChildren', label: '아이와 함께', icon: '👶' },
+                                    { key: 'allowsDogs', label: '반려동물 동반', icon: '🐕' },
+                                    { key: 'restroom', label: '화장실', icon: '🚻' },
+                                    { key: 'wheelchairAccessibleEntrance', label: '휠체어 출입', icon: '♿' },
+                                    { key: 'wheelchairAccessibleRestroom', label: '휠체어 화장실', icon: '♿🚻' },
+                                    { key: 'wheelchairAccessibleParking', label: '휠체어 주차', icon: '♿🅿️' },
+                                    { key: 'freeParkingLot', label: '무료 주차', icon: '🅿️' },
+                                    { key: 'paidParkingLot', label: '유료 주차', icon: '🅿️💰' },
+                                    { key: 'acceptsCreditCards', label: '신용카드', icon: '💳' },
+                                    { key: 'acceptsContactlessPayment', label: '무선결제', icon: '📱💳' },
+                                ];
 
-                                {/* 컨텐츠 타입 카드 */}
-                                <div className={styles.featureCard}>
-                                    <div className={styles.featureText}>{destination.contentTypeName}</div>
-                                </div>
+                                const activeFacilities = facilityFields.filter(field =>
+                                    destination[field.key as keyof typeof destination] === true
+                                );
 
-                                {/* 상세 정보 카드들 */}
-                                {destination.detailInfoJson?.map((info: any, index: number) => {
-                                    console.log('=== Feature Card 정보 ===');
-                                    console.log('Index:', index);
-                                    console.log('Info Name:', info.infoname);
-                                    console.log('Info Text:', info.infotext);
-                                    console.log('Text Length:', info.infotext?.length || 0);
-                                    console.log('-------------------');
+                                const hasContent =
+                                    (destination.googleRatingCount && destination.googleRatingCount > 0) ||
+                                    destination.contentTypeName ||
+                                    (destination.tel && destination.tel.trim() !== '') ||
+                                    (destination.overview && destination.overview.trim() !== '') ||
+                                    activeFacilities.length > 0;
 
-                                    const isLongText = (info.infotext?.length || 0) > 50;
-
-                                    return (
-                                        <div
-                                            key={index}
-                                            className={styles.featureCard}
-                                            onClick={isLongText ? () => setShowDetailModal({
-                                                title: info.infoname,
-                                                content: info.infotext
-                                            }) : undefined}
-                                            style={{ cursor: isLongText ? 'pointer' : 'default' }}
-                                        >
-                                            <div className={styles.featureText}>{info.infoname}</div>
-                                            <div className={styles.featureSubText}>
-                                                {isLongText ? `${info.infotext.substring(0, 50)}...` : info.infotext}
+                                return hasContent ? (
+                                    <div className={styles.featuresGrid}>
+                                        {/* 평점 카드 - reviewCount가 0보다 클 때만 표시 */}
+                                        {destination.googleRatingCount && destination.googleRatingCount > 0 && (
+                                            <div
+                                                className={styles.featureCard}
+                                                onClick={() => setShowReviewModal(true)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                <div className={styles.ratingText}>
+                                                    ⭐ {(destination.googleRating || 0).toFixed(1)}
+                                                </div>
+                                                <div className={styles.ratingSubText}>
+                                                    ({(destination.googleRatingCount || 0)}개 리뷰)
+                                                </div>
                                             </div>
-                                            {isLongText && <div className={styles.moreText}>더보기</div>}
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                        )}
+
+                                        {/* 컨텐츠 타입 카드 - 내용이 있을 때만 표시 */}
+                                        {destination.contentTypeName && (
+                                            <div className={styles.featureCard}>
+                                                <div className={styles.featureText}>{destination.contentTypeName}</div>
+                                            </div>
+                                        )}
+
+                                        {/* 전화번호 카드 - tel이 있을 때만 표시 */}
+                                        {destination.tel && destination.tel.trim() !== '' && (() => {
+                                            const phoneNumbers = destination.tel.split(/[,\n]/).map(phone => phone.trim()).filter(phone => phone !== '');
+                                            return (
+                                                <div className={styles.featureCard}>
+                                                    <div className={styles.featureText}>
+                                                        📞 {phoneNumbers.map((phone, index) => (
+                                                            <React.Fragment key={index}>
+                                                                {phone}
+                                                                {index < phoneNumbers.length - 1 && <br />}
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })()}
+
+                                        {/* 개요 카드 - overview가 있을 때만 표시 */}
+                                        {destination.overview && destination.overview.trim() !== '' && (() => {
+                                            const isLongText = destination.overview.length > 100;
+                                            return (
+                                                <div
+                                                    className={styles.featureCard}
+                                                    onClick={isLongText ? () => setShowDetailModal({
+                                                        title: '상세 정보',
+                                                        content: destination.overview
+                                                    }) : undefined}
+                                                    style={{ cursor: isLongText ? 'pointer' : 'default' }}
+                                                >
+                                                    <div className={styles.featureText}>
+                                                        📝 {isLongText
+                                                            ? `${destination.overview.substring(0, 100)}...`
+                                                            : destination.overview}
+                                                    </div>
+                                                    {isLongText && <div className={styles.moreText}>더보기</div>}
+                                                </div>
+                                            );
+                                        })()}
+
+                                        {/* 편의시설 카드들 - true인 것만 표시 */}
+                                        {activeFacilities.map((facility, index) => (
+                                            <div key={index} className={styles.featureCard}>
+                                                <div className={styles.featureText}>
+                                                    {facility.icon} {facility.label}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : null;
+                            })()}
                         </div>
                     </div>
                 </div>
@@ -394,7 +497,7 @@ const ContentDetail: NextPage = () => {
                                         destination.reviews.map((review: any, index: number) => (
                                             <div key={index} className={styles.reviewItem}>
                                                 <div className={styles.reviewHeader}>
-                                                    <div className={styles.reviewerName}>{review.author || '익명'}</div>
+                                                    <div className={styles.reviewerName}>{review.authorName || review.author || '익명'}</div>
                                                     <div className={styles.reviewRating}>
                                                         {[...Array(5)].map((_, i) => (
                                                             <span
@@ -406,8 +509,8 @@ const ContentDetail: NextPage = () => {
                                                         ))}
                                                     </div>
                                                 </div>
-                                                <div className={styles.reviewText}>{review.content || '리뷰 내용이 없습니다.'}</div>
-                                                <div className={styles.reviewDate}>{review.date || '날짜 정보 없음'}</div>
+                                                <div className={styles.reviewText}>{review.reviewText || review.content || review.translatedText || '리뷰 내용이 없습니다.'}</div>
+                                                <div className={styles.reviewDate}>{review.relativeTimeDescription || review.reviewTime || review.date || '날짜 정보 없음'}</div>
                                             </div>
                                         ))
                                     ) : (

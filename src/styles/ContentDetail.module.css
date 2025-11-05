@@ -421,8 +421,17 @@
 
 /* 가로모드 (landscape) */
 @media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
     .content {
         width: 100vw;
+        height: calc(100vh - 70px);
+        min-height: auto;
         box-sizing: border-box;
         overflow: hidden;
         display: flex;
@@ -438,7 +447,6 @@
         height: calc(100vh - 80px);
         width: 100%;
         max-width: 100%;
-        overflow: hidden;
         align-items: stretch;
         justify-content: center;
     }
@@ -512,7 +520,7 @@
         -webkit-line-clamp: 2;
         line-clamp: 2;
         -webkit-box-orient: vertical;
-        max-height: 1.56em;
+
     }
 
     .featureSubText {

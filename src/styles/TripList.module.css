@@ -330,3 +330,83 @@
         font-size: 1rem;
     }
 }
+
+/* 가로모드 (landscape) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content {
+        height: calc(100vh - 70px);
+        min-height: auto;
+        padding: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tripGrid {
+        height: calc(100vh - 90px);
+        padding: 10px;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .tripCard {
+        width: 180px;
+        height: 180px;
+    }
+
+    .cardContent {
+        padding: 10px;
+    }
+
+    .cardTitle {
+        font-size: 1rem;
+        margin-bottom: 6px;
+    }
+
+    .cardDate {
+        font-size: 0.85rem;
+        margin-bottom: 2px;
+    }
+
+    .cardDateRange {
+        font-size: 0.7rem;
+    }
+
+    .emoji {
+        font-size: 2rem;
+    }
+
+    .emptyState {
+        height: calc(100vh - 90px);
+        padding: 20px;
+        min-height: auto;
+    }
+
+    .emptyIcon {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .emptyTitle {
+        font-size: 1.1rem;
+    }
+
+    .emptyDescription {
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+
+    .addTripButton {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}

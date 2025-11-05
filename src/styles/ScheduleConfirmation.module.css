@@ -1,5 +1,5 @@
 .container {
-    min-height: 100vh;
+    height: 100vh;
     background: #CEF4F7;
     display: flex;
     flex-direction: column;
@@ -10,10 +10,12 @@
     flex: 1;
     display: grid;
     grid-template-columns: 1fr 1.3fr;
-
-    padding: 30px;
+    gap: 20px;
+    padding: 20px;
     height: calc(100vh - 80px);
     box-sizing: border-box;
+    overflow: hidden;
+    min-height: 0;
 }
 
 .mapSection {
@@ -21,11 +23,13 @@
     flex-direction: column;
     background: white;
     border-radius: 20px;
-    padding: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(0, 0, 0, 0.1);
     height: 100%;
-    min-height: 500px;
+    min-height: 0;
+    overflow: hidden;
+    padding: 15px;
+    box-sizing: border-box;
 }
 
 .mapContainer {
@@ -36,17 +40,19 @@
     overflow: hidden;
     border: 2px solid #000;
     height: 100%;
-    min-height: 450px;
+    min-height: 0;
     background: #f0f0f0;
     position: relative;
 }
-
-
 
 .scheduleSection {
     display: flex;
     flex-direction: column;
     padding: 20px;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .scheduleHeader {
@@ -82,6 +88,8 @@
     gap: 15px;
     overflow-y: auto;
     padding: 10px;
+    min-height: 0;
+    height: 100%;
 }
 
 /* 날짜 네비게이션 UI */
@@ -128,8 +136,8 @@
     flex-direction: column;
     gap: 15px;
     overflow-y: auto;
-    max-height: calc(100vh - 300px);
     padding-right: 5px;
+    min-height: 0;
 }
 
 /* 커스텀 스크롤바 */
@@ -265,37 +273,46 @@
 
 /* 가로모드 (landscape) */
 @media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        height: 100vh;
+        overflow: hidden;
+    }
+
     .content {
         grid-template-columns: 1fr 1.2fr;
-        gap: 15px;
-        padding: 15px;
-        height: 100vh;
-        width: 100vw;
-        box-sizing: border-box;
+        gap: 10px;
+        padding: 10px;
+        height: calc(100vh - 70px);
+        min-height: 0;
         overflow: hidden;
-        align-items: start;
+    }
+
+    .mapSection {
+        height: 100%;
+        min-height: 0;
+        padding: 10px;
+        overflow: hidden;
     }
 
     .mapContainer {
-        margin: 0;
         height: 100%;
-        min-height: 60vh;
+        min-height: 0;
         width: 100%;
-        max-width: 100%;
         overflow: hidden;
     }
 
     .scheduleSection {
         height: 100%;
+        min-height: 0;
         overflow-y: auto;
         padding: 10px;
         width: 100%;
-        max-width: 100%;
     }
 
     .selectedDateActivities {
-        max-height: calc(100vh - 200px);
+        max-height: calc(100vh - 180px);
         overflow-y: auto;
+        min-height: 0;
     }
 
     .scheduleHeader {
@@ -429,5 +446,100 @@
     .detailsButton {
         padding: 8px 16px;
         font-size: 0.8rem;
+    }
+}
+
+/* 빈 일정 상태 스타일 */
+.emptyScheduleContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    padding: 40px 20px;
+}
+
+.emptyScheduleContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    max-width: 400px;
+}
+
+.emptyScheduleIcon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.emptyScheduleTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 12px 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.emptyScheduleDescription {
+    font-size: 1rem;
+    color: #666;
+    margin: 0 0 30px 0;
+    line-height: 1.5;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.generateScheduleButton {
+    background: linear-gradient(135deg, #00EEFF 0%, #0099CC 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 238, 255, 0.3);
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.generateScheduleButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 238, 255, 0.4);
+    background: linear-gradient(135deg, #0099CC 0%, #0077AA 100%);
+}
+
+.generateScheduleButton:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 가로모드에서 빈 일정 상태 조정 */
+@media (max-height: 500px) and (orientation: landscape) {
+    .emptyScheduleContainer {
+        min-height: 300px;
+        padding: 20px;
+    }
+
+    .emptyScheduleIcon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+
+    .emptyScheduleTitle {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+    }
+
+    .emptyScheduleDescription {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    .generateScheduleButton {
+        padding: 12px 24px;
+        font-size: 1rem;
     }
 }

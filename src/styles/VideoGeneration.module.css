@@ -749,8 +749,18 @@
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
     .content {
-        padding: 15px;
+        padding: 10px;
+        height: calc(100vh - 70px);
+        min-height: auto;
+        overflow: hidden;
     }
 
     .generationContainer {

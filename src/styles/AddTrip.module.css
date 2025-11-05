@@ -390,9 +390,17 @@
 
 /* 가로모드 (landscape) */
 @media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
     .content {
         padding: 10px;
-        height: 100vh;
+        height: calc(100vh - 70px);
+        min-height: auto;
         width: 100vw;
         box-sizing: border-box;
         overflow: hidden;

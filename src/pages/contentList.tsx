@@ -6,7 +6,7 @@ import Header from "../components/Header";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "../styles/ContentList.module.css";
-import { getContentsByRegion, ContentItem, addBasketItem, BasketItemRequest, getBasket } from "../helpers/api";
+import { getContentsByRegion, ContentItem, addBasketItem, deleteBasketItem, BasketItemRequest, getBasket } from "../helpers/api";
 
 const ContentList: NextPage = () => {
     const router = useRouter();
@@ -135,134 +135,94 @@ const ContentList: NextPage = () => {
         loadBasketItems();
     }, [authLoading, user, safeTripId]);
 
-    // 페이지 포커스 시에도 선택 상태 다시 로드
+    // 페이지 포커스 시 서버에서 선택 상태 다시 로드
     useEffect(() => {
-        const handleFocus = () => {
-            if (safeTripId) {
-                const selectedDestinationsData = JSON.parse(localStorage.getItem('selectedDestinations') || '{}');
-                const tripKey = `trip_${safeTripId}`;
-                const selectedForThisTrip = selectedDestinationsData[tripKey] || [];
-                const selectedIds = selectedForThisTrip.map((dest: any) => dest.id);
-                console.log('Refreshing selected destinations on focus:', selectedIds);
-                setSelectedDestinations(selectedIds);
+        const handleFocus = async () => {
+            if (safeTripId && user && !authLoading) {
+                try {
+                    const basketItems = await getBasket(safeTripId);
+                    const selectedIds = basketItems.map(item => item.placeId);
+                    console.log('🔄 포커스 시 장바구니 상태 새로고침:', selectedIds);
+                    setSelectedDestinations(selectedIds);
+                } catch (error) {
+                    console.error('❌ 포커스 시 장바구니 불러오기 실패:', error);
+                }
             }
         };
 
         window.addEventListener('focus', handleFocus);
         return () => window.removeEventListener('focus', handleFocus);
-    }, [safeTripId]);
+    }, [safeTripId, user, authLoading]);
 
-    // 라우트 변경 시 선택 상태 새로고침 (비활성화 - 문제 원인)
-    // useEffect(() => {
-    //     const handleRouteChange = () => {
-    //         console.log('=== ROUTE CHANGE DETECTED ===');
-    //         if (safeTripId) {
-    //             const selectedDestinationsData = JSON.parse(localStorage.getItem('selectedDestinations') || '{}');
-    //             const tripKey = `trip_${safeTripId}`;
-    //             const selectedForThisTrip = selectedDestinationsData[tripKey] || [];
-    //             const selectedIds = selectedForThisTrip.map((dest: any) => dest.id);
-    //             console.log('Full localStorage data:', selectedDestinationsData);
-    //             console.log('TripKey:', tripKey);
-    //             console.log('Selected destinations for this trip:', selectedForThisTrip);
-    //             console.log('Selected IDs:', selectedIds);
-    //             console.log('Setting selectedDestinations state to:', selectedIds);
-    //             setSelectedDestinations(selectedIds);
-    //         }
-    //     };
-
-    //     router.events.on('routeChangeComplete', handleRouteChange);
-    //     return () => {
-    //         router.events.off('routeChangeComplete', handleRouteChange);
-    //     };
-    // }, [safeTripId, router.events]);
-
-    // 컴포넌트 마운트 시에도 선택 상태 새로고침
+    // 라우트 변경 시 서버에서 선택 상태 다시 로드
     useEffect(() => {
-        if (safeTripId) {
-            const selectedDestinationsData = JSON.parse(localStorage.getItem('selectedDestinations') || '{}');
-            const tripKey = `trip_${safeTripId}`;
-            const selectedForThisTrip = selectedDestinationsData[tripKey] || [];
-            const selectedIds = selectedForThisTrip.map((dest: any) => dest.contentId);
-            console.log('Refreshing selected destinations on component mount:', selectedIds);
-            setSelectedDestinations(selectedIds);
-        }
-    }, [safeTripId]);
+        const handleRouteChange = async () => {
+            if (safeTripId && user && !authLoading) {
+                try {
+                    const basketItems = await getBasket(safeTripId);
+                    const selectedIds = basketItems.map(item => item.placeId);
+                    console.log('🔄 라우트 변경 시 장바구니 상태 새로고침:', selectedIds);
+                    setSelectedDestinations(selectedIds);
+                } catch (error) {
+                    console.error('❌ 라우트 변경 시 장바구니 불러오기 실패:', error);
+                }
+            }
+        };
+
+        router.events.on('routeChangeComplete', handleRouteChange);
+        return () => {
+            router.events.off('routeChangeComplete', handleRouteChange);
+        };
+    }, [safeTripId, user, authLoading, router.events]);
 
     const handleBack = () => {
         router.push(`/contentMenu?tripId=${safeTripId}`);
     };
 
-    const handleComplete = async () => {
-        if (!safeTripId) {
-            console.error('TripId가 없습니다.');
-            return;
-        }
-
-        // 선택된 여행지들을 서버에 전송
-        const selectedItems = destinations.filter(dest => selectedDestinations.includes(dest.id));
-
-        try {
-            // 이미 선택된 항목 확인을 위해 현재 장바구니 불러오기
-            const currentBasket = await getBasket(safeTripId);
-            const existingPlaceIds = currentBasket.map(item => item.placeId);
-
-            console.log('=== 현재 장바구니 ===');
-            console.log('Existing place IDs:', existingPlaceIds);
-
-            // 중복 제거: 이미 장바구니에 있는 항목은 제외
-            const newItems = selectedItems.filter(dest => !existingPlaceIds.includes(dest.id));
-
-            console.log('=== 새로 추가할 항목 ===');
-            console.log('New items to add:', newItems.length);
-
-            // 새로 선택된 여행지들만 서버에 전송
-            for (const destination of newItems) {
-                const basketItem: BasketItemRequest = {
-                    placeId: destination.id,
-                    // note는 선택사항이므로 빈 문자열로 전송
-                    note: ''
-                };
-
-                await addBasketItem(safeTripId, basketItem);
-                console.log(`✅ 장바구니에 추가됨: ${destination.title}`);
-            }
-
-            console.log('🎉 모든 항목이 장바구니에 추가되었습니다!');
-
-            // 저장 완료 후 contentMenu로 이동
-            router.push(`/contentMenu?tripId=${safeTripId}`);
-        } catch (error) {
-            console.error('❌ 장바구니 항목 추가 실패:', error);
-            alert('장바구니에 항목을 추가하는데 실패했습니다. 다시 시도해주세요.');
-        }
-    };
+    // 완료 버튼 제거 - 체크박스 클릭 시 즉시 서버에 저장하므로 불필요
 
     const handleDestinationClick = (destinationId: string) => {
         router.push(`/contentDetail?tripId=${safeTripId}&destinationId=${destinationId}&regionName=${safeRegionName}`);
     };
 
-    const handleCheckboxClick = (e: React.MouseEvent, destinationId: string) => {
+    const handleCheckboxClick = async (e: React.MouseEvent, destinationId: string) => {
         e.stopPropagation(); // 카드 클릭 이벤트 방지
+
+        if (!safeTripId) {
+            console.error('TripId가 없습니다.');
+            return;
+        }
 
         console.log('=== CHECKBOX CLICKED ===');
         console.log('Destination ID:', destinationId);
         console.log('SafeTripId:', safeTripId);
 
-        // 로컬스토리지 대신 state만 사용
         const isSelected = selectedDestinations.includes(destinationId);
         console.log('Is currently selected:', isSelected);
 
-        if (isSelected) {
-            // 선택 해제
-            setSelectedDestinations(prev => prev.filter(id => id !== destinationId));
-            console.log('Removed destination from selection');
-        } else {
-            // 선택 추가
-            setSelectedDestinations(prev => [...prev, destinationId]);
-            console.log('Added destination to selection');
+        try {
+            if (isSelected) {
+                // 선택 해제 - 서버에서 삭제
+                await deleteBasketItem(safeTripId, destinationId);
+                setSelectedDestinations(prev => prev.filter(id => id !== destinationId));
+                console.log('✅ 장바구니에서 제거됨:', destinationId);
+            } else {
+                // 선택 추가 - 서버에 추가
+                const destination = destinations.find(d => d.id === destinationId);
+                if (destination) {
+                    const basketItem: BasketItemRequest = {
+                        placeId: destination.id,
+                        note: ''
+                    };
+                    await addBasketItem(safeTripId, basketItem);
+                    setSelectedDestinations(prev => [...prev, destinationId]);
+                    console.log('✅ 장바구니에 추가됨:', destination.title);
+                }
+            }
+        } catch (error) {
+            console.error('❌ 장바구니 업데이트 실패:', error);
+            alert('장바구니 업데이트에 실패했습니다. 다시 시도해주세요.');
         }
-
-        console.log('Current selected destinations:', selectedDestinations);
     };
 
 
@@ -279,90 +239,86 @@ const ContentList: NextPage = () => {
                     <link rel="icon" href="/favicon.ico" />
                 </Head>
                 <div className={styles.container}>
-                <Header
-                    backgroundColor="#FFE135"
-                    leftIcons={['🛟', '🧴']}
-                    rightIcons={['🏮', '🏄', '🏐']}
-                    title="가고 싶은 곳을 선택해보세요!"
-                    leftButton={{
-                        text: "돌아가기",
-                        onClick: handleBack
-                    }}
-                    rightButton={{
-                        text: "완료",
-                        onClick: handleComplete
-                    }}
-                />
+                    <Header
+                        backgroundColor="#FFE135"
+                        leftIcons={['🛟', '🧴']}
+                        rightIcons={['🏮', '🏄', '🏐']}
+                        title="가고 싶은 곳을 선택해보세요!"
+                        leftButton={{
+                            text: "돌아가기",
+                            onClick: handleBack
+                        }}
+                    />
 
-                <div className={styles.content}>
-                    {loading ? (
-                        <div className={styles.loadingContainer}>
-                            <div className={styles.spinner}></div>
-                            <p>여행지를 불러오는 중...</p>
-                        </div>
-                    ) : error ? (
-                        <div className={styles.errorContainer}>
-                            <p className={styles.errorMessage}>{error}</p>
-                            <button
-                                className={styles.retryButton}
-                                onClick={() => window.location.reload()}
-                            >
-                                다시 시도
-                            </button>
-                        </div>
-                    ) : (
-                        <div className={styles.destinationGrid}>
-                            {destinations.map((destination) => {
-                                console.log('=== 개별 여행지 정보 ===');
-                                console.log('ID:', destination.contentId);
-                                console.log('제목:', destination.title);
-                                console.log('이미지 URL:', destination.photoUrl);
-                                console.log('평점:', destination.rating);
-                                console.log('리뷰 수:', destination.ratingCount);
-                                console.log('주소:', destination.address);
-                                console.log('-------------------');
+                    <div className={styles.content}>
+                        {loading ? (
+                            <div className={styles.loadingContainer}>
+                                <div className={styles.spinner}></div>
+                                <p>여행지를 불러오는 중...</p>
+                            </div>
+                        ) : error ? (
+                            <div className={styles.errorContainer}>
+                                <p className={styles.errorMessage}>{error}</p>
+                                <button
+                                    className={styles.retryButton}
+                                    onClick={() => window.location.reload()}
+                                >
+                                    다시 시도
+                                </button>
+                            </div>
+                        ) : (
+                            <div className={styles.destinationGrid}>
+                                {destinations.map((destination) => {
+                                    console.log('=== 개별 여행지 정보 ===');
+                                    console.log('ID:', destination.contentId);
+                                    console.log('제목:', destination.title);
+                                    console.log('이미지 URL:', destination.photoUrl);
+                                    console.log('평점:', destination.rating);
+                                    console.log('리뷰 수:', destination.ratingCount);
+                                    console.log('주소:', destination.address);
+                                    console.log('-------------------');
 
-                                return (
-                                    <div
-                                        key={destination.contentId}
-                                        className={`${styles.destinationCard} ${selectedDestinations.includes(destination.id) ? styles.selectedCard : ''}`}
-                                        onClick={() => handleDestinationClick(destination.id)}
-                                    >
-                                        <div className={styles.cardImage}>
-                                            <img
-                                                src={destination.photoUrl}
-                                                alt={destination.title}
-                                                className={styles.destinationImage}
-                                                onError={(e) => {
-                                                    const target = e.target as HTMLImageElement;
-                                                    target.style.display = 'none';
-                                                    target.nextElementSibling?.classList.remove('hidden');
-                                                }}
-                                            />
-                                            <div
-                                                className={`${styles.checkbox} ${selectedDestinations.includes(destination.id) ? styles.checked : ''}`}
-                                                onClick={(e) => handleCheckboxClick(e, destination.id)}
-                                            >
-                                                {selectedDestinations.includes(destination.id) && '✓'}
+                                    return (
+                                        <div
+                                            key={destination.contentId}
+                                            className={`${styles.destinationCard} ${selectedDestinations.includes(destination.id) ? styles.selectedCard : ''}`}
+                                            onClick={() => handleDestinationClick(destination.id)}
+                                        >
+                                            <div className={styles.cardImage}>
+                                                <img
+                                                    src={destination.photoUrl}
+                                                    alt={destination.title}
+                                                    className={styles.destinationImage}
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.style.display = 'none';
+                                                        target.nextElementSibling?.classList.remove('hidden');
+                                                    }}
+                                                />
+                                                <div
+                                                    className={`${styles.checkbox} ${selectedDestinations.includes(destination.id) ? styles.checked : ''}`}
+                                                    onClick={(e) => handleCheckboxClick(e, destination.id)}
+                                                >
+                                                    {selectedDestinations.includes(destination.id) && '✓'}
+                                                </div>
+                                            </div>
+                                            <div className={styles.cardContent}>
+                                                <h3 className={styles.cardTitle}>{destination.title}</h3>
+                                                <div className={styles.ratingContainer}>
+                                                    <span className={styles.rating}>
+                                                        ⭐ {(destination.rating || 0).toFixed(1)}
+                                                    </span>
+                                                    <span className={styles.ratingCount}>
+                                                        ({(destination.ratingCount || 0)}개 리뷰)
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className={styles.cardContent}>
-                                            <h3 className={styles.cardTitle}>{destination.title}</h3>
-                                            <div className={styles.ratingContainer}>
-                                                <span className={styles.rating}>
-                                                    ⭐ {(destination.rating || 0).toFixed(1)}
-                                                </span>
-                                                <span className={styles.ratingCount}>
-                                                    ({(destination.ratingCount || 0)}개 리뷰)
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </ProtectedRoute>

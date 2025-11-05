@@ -255,3 +255,59 @@
         font-size: 0.75rem;
     }
 }
+
+/* 가로모드 (landscape) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .container {
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .content {
+        height: calc(100vh - 70px);
+        min-height: auto;
+        padding: 10px;
+        overflow: hidden;
+    }
+
+    .loginCard {
+        max-width: 300px;
+        padding: 15px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+
+    .title {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+
+    .inputGroup {
+        margin-bottom: 8px;
+    }
+
+    .input {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    .loginButton {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    .socialButton {
+        padding: 6px;
+        font-size: 0.7rem;
+    }
+
+    .divider {
+        margin: 10px 0;
+    }
+
+    .footer {
+        margin-top: 10px;
+    }
+}

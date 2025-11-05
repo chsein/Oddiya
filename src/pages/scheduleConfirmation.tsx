@@ -26,6 +26,12 @@ const ScheduleConfirmation: NextPage = () => {
     const mapRef = useRef<NaverMapRef>(null);
 
     const handleBack = () => {
+        if (!safeTripId) {
+            console.error('TripId가 없습니다.');
+            // tripId가 없으면 tripList로 이동
+            router.push('/tripList');
+            return;
+        }
         router.push(`/contentMenu?tripId=${safeTripId}`);
     };
 
@@ -197,6 +203,9 @@ const ScheduleConfirmation: NextPage = () => {
     // API 응답 구조에 따라 데이터 추출
     const activities = itinerary?.scheduleItems || itinerary?.scheduledItems || itinerary?.schedules || itinerary?.itinerary || [];
 
+    // 일정이 있는지 확인
+    const hasScheduleItems = Array.isArray(activities) && activities.length > 0;
+
     // startDate부터 날짜 배열 생성
     const startDate = itinerary?.startDate;
     console.log('📅 startDate:', startDate);
@@ -308,11 +317,11 @@ const ScheduleConfirmation: NextPage = () => {
                         text: "돌아가기",
                         onClick: handleBack
                     }}
-                    rightButton={{
+                    rightButton={hasScheduleItems ? {
                         text: loading ? "재생성 중..." : "재생성하기",
                         onClick: handleRegenerate,
                         disabled: loading
-                    }}
+                    } : undefined}
                 />
 
                 <div className={styles.content}>
@@ -411,8 +420,21 @@ const ScheduleConfirmation: NextPage = () => {
                         )}
 
                         {!loading && !error && dayKeys.length === 0 && (
-                            <div style={{ padding: '40px', textAlign: 'center' }}>
-                                <p>일정이 없습니다. 재생성 버튼을 눌러주세요.</p>
+                            <div className={styles.emptyScheduleContainer}>
+                                <div className={styles.emptyScheduleContent}>
+                                    <div className={styles.emptyScheduleIcon}>📅</div>
+                                    <h3 className={styles.emptyScheduleTitle}>일정이 없습니다</h3>
+                                    <p className={styles.emptyScheduleDescription}>
+                                        AI를 활용해서 여행 일정을 생성해보세요!
+                                    </p>
+                                    <button
+                                        className={styles.generateScheduleButton}
+                                        onClick={handleRegenerate}
+                                        disabled={loading}
+                                    >
+                                        {loading ? '생성 중...' : '🤖 AI를 활용해서 일정을 생성하기'}
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>

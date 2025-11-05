@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../helpers/firebase';
 import {
@@ -26,6 +26,35 @@ const Login: NextPage = () => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [tokenInfo, setTokenInfo] = useState<string>('');
+
+    // 이미 로그인되어 있으면 tripList로 리다이렉트
+    useEffect(() => {
+        const checkAuthAndRedirect = async () => {
+            // 로딩 중이면 대기
+            if (loading) {
+                return;
+            }
+
+            // 사용자가 로그인되어 있으면 토큰 확인 후 리다이렉트
+            if (user) {
+                try {
+                    const token = await getCurrentUserIdToken();
+                    if (token) {
+                        console.log('✅ 이미 로그인되어 있음. tripList로 리다이렉트');
+                        // returnUrl이 있으면 해당 페이지로, 없으면 tripList로 이동
+                        const returnUrl = router.query.returnUrl as string;
+                        const redirectPath = returnUrl || '/tripList';
+                        router.push(redirectPath);
+                    }
+                } catch (error) {
+                    console.error('❌ 토큰 확인 실패:', error);
+                    // 토큰이 없으면 로그인 화면 유지
+                }
+            }
+        };
+
+        checkAuthAndRedirect();
+    }, [user, loading, router]);
 
     const handleLogin = (email: string) => {
         console.log('Login successful:', { email });
