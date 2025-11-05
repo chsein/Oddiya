@@ -295,7 +295,6 @@ const Record: NextPage = () => {
                         <div className={styles.photoModal} onClick={handleCloseModal}>
                             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                                 <div className={styles.modalHeader}>
-                                    <span className={styles.modalFileName}>{selectedPhoto.fileName}</span>
                                     <button className={styles.modalCloseButton} onClick={handleCloseModal}>
                                         ✕
                                     </button>
