@@ -28,33 +28,33 @@ const Login: NextPage = () => {
     const [tokenInfo, setTokenInfo] = useState<string>('');
 
     // 이미 로그인되어 있으면 tripList로 리다이렉트
-    useEffect(() => {
-        const checkAuthAndRedirect = async () => {
-            // 로딩 중이면 대기
-            if (loading) {
-                return;
-            }
+    // useEffect(() => {
+    //     const checkAuthAndRedirect = async () => {
+    //         // 로딩 중이면 대기
+    //         if (loading) {
+    //             return;
+    //         }
 
-            // 사용자가 로그인되어 있으면 토큰 확인 후 리다이렉트
-            if (user) {
-                try {
-                    const token = await getCurrentUserIdToken();
-                    if (token) {
-                        console.log('✅ 이미 로그인되어 있음. tripList로 리다이렉트');
-                        // returnUrl이 있으면 해당 페이지로, 없으면 tripList로 이동
-                        const returnUrl = router.query.returnUrl as string;
-                        const redirectPath = returnUrl || '/tripList';
-                        router.push(redirectPath);
-                    }
-                } catch (error) {
-                    console.error('❌ 토큰 확인 실패:', error);
-                    // 토큰이 없으면 로그인 화면 유지
-                }
-            }
-        };
+    //         // 사용자가 로그인되어 있으면 토큰 확인 후 리다이렉트
+    //         if (user) {
+    //             try {
+    //                 const token = await getCurrentUserIdToken();
+    //                 if (token) {
+    //                     console.log('✅ 이미 로그인되어 있음. tripList로 리다이렉트');
+    //                     // returnUrl이 있으면 해당 페이지로, 없으면 tripList로 이동
+    //                     const returnUrl = router.query.returnUrl as string;
+    //                     const redirectPath = returnUrl || '/tripList';
+    //                     router.push(redirectPath);
+    //                 }
+    //             } catch (error) {
+    //                 console.error('❌ 토큰 확인 실패:', error);
+    //                 // 토큰이 없으면 로그인 화면 유지
+    //             }
+    //         }
+    //     };
 
-        checkAuthAndRedirect();
-    }, [user, loading, router]);
+    //     checkAuthAndRedirect();
+    // }, [user, loading, router]);
 
     const handleLogin = (email: string) => {
         console.log('Login successful:', { email });
@@ -96,21 +96,23 @@ const Login: NextPage = () => {
     };
 
     const handleGoogleLogin = async () => {
+        console.log('🔵 Google 로그인 버튼 클릭');
         setIsLoading(true);
         setError(null);
 
         try {
-            // 모바일이면 리다이렉트 방식, 데스크톱이면 팝업 방식
-            if (isMobile()) {
-                await signInWithGoogleRedirect();
-                // 리다이렉트되므로 이후 코드는 실행되지 않음
-            } else {
-                const result = await signInWithGoogle();
-                console.log('✅ Google 로그인 성공:', result.user.email);
-                handleLogin(result.user.email || 'Google User');
-            }
+            console.log('🔵 isMobile:', isMobile());
+            console.log('🔵 Firebase auth:', auth);
+
+            // 항상 팝업 방식 사용 (테스트용)
+            console.log('🔵 signInWithGoogle 호출 시작...');
+            const result = await signInWithGoogle();
+            console.log('✅ Google 로그인 성공:', result.user.email);
+            handleLogin(result.user.email || 'Google User');
         } catch (error: any) {
             console.error('❌ Google 로그인 실패:', error);
+            console.error('❌ Error code:', error.code);
+            console.error('❌ Error message:', error.message);
             setError(error.message || 'Google 로그인에 실패했습니다.');
             setIsLoading(false);
         }

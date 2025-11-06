@@ -22,19 +22,31 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:8
  */
 export const signInWithGoogle = async (): Promise<UserCredential> => {
     try {
+        console.log('🟢 signInWithGoogle 함수 시작');
+        console.log('🟢 Firebase auth 객체:', auth);
+
         const provider = new GoogleAuthProvider();
+        console.log('🟢 GoogleAuthProvider 생성 완료');
+
         provider.addScope('profile');
         provider.addScope('email');
+        console.log('🟢 Scopes 추가 완료');
 
+        console.log('🟢 signInWithPopup 호출 직전...');
         const result = await signInWithPopup(auth, provider);
         console.log('✅ Google 로그인 성공 (팝업):', result.user.email);
 
         // 백엔드와 동기화
+        console.log('🟢 백엔드 동기화 시작...');
         await syncUserWithBackend(result.user);
+        console.log('✅ 백엔드 동기화 완료');
 
         return result;
     } catch (error: any) {
         console.error('❌ Google 로그인 실패 (팝업):', error);
+        console.error('❌ Error code:', error.code);
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Full error:', JSON.stringify(error, null, 2));
         throw handleAuthError(error);
     }
 };
