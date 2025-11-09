@@ -10,7 +10,7 @@
 
 .content {
     flex: 1;
-    padding: 0;
+    padding: 30px;
     height: calc(100vh - 80px);
     box-sizing: border-box;
     display: flex;
@@ -307,6 +307,16 @@
 }
 
 /* 영상 미리보기 스타일 */
+.previewContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
 .videoPreview {
     background: transparent;
     border: none;
@@ -323,12 +333,26 @@
 }
 
 .previewTitle {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: #333;
-    margin: 0 0 20px 0;
+    margin: 0;
+    padding: 15px 20px;
     text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 2px solid #333;
     font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    flex-shrink: 0;
+}
+
+.remotionPlayerWrapper {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black;
+    overflow: hidden;
 }
 
 .playerContainer {
@@ -513,6 +537,43 @@
 
 /* videoPlayer 스타일 제거 - Player 컴포넌트 사용 */
 
+.previewActions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-top: 2px solid #333;
+    flex-shrink: 0;
+}
+
+.retryButton,
+.saveButton {
+    flex: 1;
+    max-width: 200px;
+    background: linear-gradient(135deg, #ffffff 50%, #00EEFF 100%);
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #333;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.saveButton {
+    background: linear-gradient(135deg, #ffffff 50%, #FFE135 100%);
+}
+
+.retryButton:hover,
+.saveButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
 .videoActions {
     display: flex;
     gap: 15px;
@@ -631,7 +692,7 @@
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .content {
-        padding: 15px;
+        padding: 20px;
     }
 
     .generationContainer {
@@ -642,9 +703,13 @@
         padding: 15px;
     }
 
+    .previewContainer {
+        padding: 0;
+    }
+
     .previewTitle {
         font-size: 1.2rem;
-        margin-bottom: 12px;
+        padding: 12px 15px;
     }
 
     .photoGrid {
@@ -666,6 +731,10 @@
         font-size: 1.5rem;
     }
 
+    .previewActions {
+        padding: 12px 15px;
+    }
+
     .playerContainer {
         min-height: 150px;
         padding: 15px;
@@ -674,6 +743,11 @@
 
     .videoPreview {
         padding: 20px;
+    }
+
+    .previewActions {
+        flex-direction: row;
+        gap: 10px;
     }
 
     .musicOptions {
@@ -699,7 +773,7 @@
 
 @media (max-width: 480px) {
     .content {
-        padding: 12px;
+        padding: 15px;
     }
 
     .emptyTitle,
@@ -724,9 +798,13 @@
         padding: 12px;
     }
 
+    .previewContainer {
+        padding: 0;
+    }
+
     .previewTitle {
         font-size: 1.1rem;
-        margin-bottom: 10px;
+        padding: 10px 12px;
     }
 
     .musicTitle {
@@ -752,6 +830,11 @@
         font-size: 1.3rem;
     }
 
+    .previewActions {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
     .playerContainer {
         min-height: 120px;
         padding: 10px;
@@ -760,6 +843,16 @@
 
     .videoPreview {
         padding: 15px;
+    }
+
+    .previewActions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .retryButton,
+    .saveButton {
+        max-width: 100%;
     }
 
     .generateButton {
@@ -777,7 +870,7 @@
     }
 
     .content {
-        padding: 8px;
+        padding: 15px;
         height: calc(100vh - 70px);
         overflow: hidden;
     }
@@ -790,9 +883,13 @@
         padding: 10px;
     }
 
+    .previewContainer {
+        padding: 0;
+    }
+
     .previewTitle {
         font-size: 1rem;
-        margin-bottom: 8px;
+        padding: 8px 10px;
     }
 
     .photoGrid {
@@ -814,6 +911,10 @@
         font-size: 1.2rem;
     }
 
+    .remotionPlayerWrapper {
+        margin-bottom: 8px;
+    }
+
     .playerContainer {
         height: calc(100vh - 200px);
         max-height: 350px;
@@ -824,6 +925,10 @@
     .videoPreview {
         padding: 10px;
         max-height: calc(100vh - 150px);
+    }
+
+    .previewActions {
+        padding: 8px 10px;
     }
 
     .videoContainer {
