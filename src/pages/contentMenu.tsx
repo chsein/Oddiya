@@ -99,7 +99,7 @@ const ContentMenu: NextPage = () => {
     return (
         <div>
             <Head>
-                <title>{tripData.title} - ODDIYA</title>
+                <title>{tripData.title}</title>
                 <meta name="description" content={`${tripData.title} 여행 관리`} />
                 <meta
                     name="viewport"
@@ -110,16 +110,16 @@ const ContentMenu: NextPage = () => {
             <div className={styles.container}>
                 <Header
                     backgroundColor="#00FFAA"
-                    leftIcons={['←', '🏠']}
-                    rightIcons={['⚙️', '📱']}
-                    title={tripData.title}
+                    leftImage={{ src: '/headerimg/yellowLeft.png', alt: 'Content Menu' }}
+                    rightImage={{ src: '/headerimg/yellowRight.png', alt: 'Content Menu' }}
+                    title={`${tripData.tripName || 'ODDIYA'}`}
                     leftButton={{
                         text: "뒤로가기",
                         onClick: handleBack
                     }}
                     rightButton={{
                         text: "설정",
-                        onClick: () => console.log('설정 클릭')
+                        onClick: () => router.push(`/settings?tripId=${tripId}`)
                     }}
                 />
 

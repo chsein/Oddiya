@@ -1,12 +1,12 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Header from "../components/Header";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "../styles/ContentList.module.css";
-import { getContentsByRegion, getContentsByType, ContentItem, addBasketItem, deleteBasketItem, BasketItemRequest, getBasket } from "../helpers/api";
+import { getContentsByRegion, ContentItem, addBasketItem, deleteBasketItem, BasketItemRequest, getBasket } from "../helpers/api";
 
 // 컨텐츠 타입 매핑
 const CONTENT_TYPES = [
@@ -26,55 +26,81 @@ const ContentList: NextPage = () => {
     const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
     const [destinations, setDestinations] = useState<ContentItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [selectedFilter, setSelectedFilter] = useState<number | null>(null); // 선택된 필터
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+    const [showEndModal, setShowEndModal] = useState(false);
+
+    const loadMoreRef = useRef<HTMLDivElement | null>(null);
+    const gridRef = useRef<HTMLDivElement | null>(null);
+    const isLoadingRef = useRef(false);
 
     // tripId와 regionName을 안전하게 처리
     const safeTripId = Array.isArray(tripId) ? tripId[0] : tripId;
     const safeRegionName = Array.isArray(regionName) ? regionName[0] : regionName;
 
-    // 사용자 로그인 후 API에서 여행지 데이터 불러오기
-    useEffect(() => {
-        const fetchDestinations = async () => {
-            // 인증 로딩 중이거나 user가 없으면 대기
-            if (authLoading || !user) {
-                return;
-            }
+    const fetchDestinations = useCallback(async (targetPage: number, reset: boolean = false) => {
+        if (authLoading || !user) {
+            return;
+        }
 
-            if (!safeRegionName && !selectedFilter) {
-                setError('지역 정보가 없습니다.');
-                setLoading(false);
-                return;
-            }
+        if (!safeRegionName) {
+            setError('지역 정보가 없습니다.');
+            setLoading(false);
+            return;
+        }
 
-            try {
+        if (isLoadingRef.current) {
+            return;
+        }
+        console.log('👀 fetchDestinations called', { targetPage, isLoading: isLoadingRef.current });
+
+
+        if (reset) {
+            setHasMore(true);
+            setDestinations([]);
+            setShowEndModal(false);
+        }
+
+        try {
+            isLoadingRef.current = true;
+            if (targetPage === 0) {
                 setLoading(true);
-                setError(null);
+            } else {
+                setIsFetchingMore(true);
+            }
+            setError(null);
 
-                // 지역별 API 호출 (필터가 있으면 contentTypeId 파라미터 추가)
-                const response = await getContentsByRegion(safeRegionName!, selectedFilter || undefined);
+            const response = await getContentsByRegion(
+                safeRegionName,
+                selectedFilter || undefined,
+                targetPage
+            );
 
-                console.log('=== API 응답 전체 ===');
-                console.log(response);
+            const newItems = response?.data?.content ?? [];
+            const pageInfo = response?.data?.page;
+            const isLastPage = pageInfo ? pageInfo.last : newItems.length === 0;
 
-                // 안전하게 데이터 접근
-                if (response && response.data) {
-                    if (response.success && response.data.content) {
-                        setDestinations(response.data.content);
-                        console.log('=== 설정된 destinations ===');
-                        console.log(response.data.content);
-                    } else {
-                        console.error('API 응답이 성공하지 않았거나 content가 없습니다:', response);
-                        setError('데이터를 불러오는데 실패했습니다.');
-                    }
-                } else {
-                    console.error('response 또는 response.data가 없습니다:', response);
-                    setError('데이터를 불러오는데 실패했습니다.');
+            setDestinations(prev => {
+                if (reset || targetPage === 0) {
+                    return newItems;
                 }
-            } catch (err) {
-                console.error('Error fetching destinations:', err);
 
-                // HTML 응답이 온 경우 (ngrok 브라우저 경고 등)
+                const existingIds = new Set(prev.map(item => item.id));
+                const filtered = newItems.filter(item => !existingIds.has(item.id));
+                return [...prev, ...filtered];
+            });
+
+            const shouldShowEndModal = isLastPage && (targetPage > 0 || newItems.length > 0);
+            setHasMore(!isLastPage);
+            setShowEndModal(shouldShowEndModal);
+            setPage(targetPage);
+        } catch (err) {
+            console.error('Error fetching destinations:', err);
+
+            if (targetPage === 0) {
                 if (err && typeof err === 'object' && 'response' in err) {
                     const axiosError = err as any;
                     if (axiosError.response && typeof axiosError.response.data === 'string' &&
@@ -86,13 +112,83 @@ const ContentList: NextPage = () => {
                 } else {
                     setError('데이터를 불러오는데 실패했습니다.');
                 }
-            } finally {
-                setLoading(false);
+            } else {
+                console.error('추가 여행지 로드 실패:', err);
             }
-        };
-
-        fetchDestinations();
+        } finally {
+            if (targetPage === 0) {
+                setLoading(false);
+            } else {
+                setIsFetchingMore(false);
+            }
+            isLoadingRef.current = false;
+        }
     }, [authLoading, user, safeRegionName, selectedFilter]);
+
+    // 필터 또는 지역 변경 시 초기화 후 첫 페이지 로드
+    useEffect(() => {
+        if (!authLoading && user && safeRegionName) {
+            fetchDestinations(0, true);
+        }
+    }, [authLoading, user, safeRegionName, selectedFilter, fetchDestinations]);
+
+    // 무한 스크롤 Intersection Observer 설정
+    useEffect(() => {
+        console.log("🟡 useEffect (observer setup) 실행됨");
+        if (loading) {
+            console.log("⏸ 로딩 중이라 observer 설정 안 함");
+            return;
+        }
+        if (!hasMore) {
+            console.log("🚫 hasMore=false, 더 이상 로드 안 함");
+            return;
+        }
+
+        const sentinel = loadMoreRef.current;
+        if (!sentinel) {
+            console.log("❌ loadMoreRef.current 없음");
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const [entry] = entries;
+                if (entry.isIntersecting) {
+                    console.log("✅ entry.isIntersecting → fetchDestinations 호출");
+                    fetchDestinations(page + 1);
+                }
+            },
+            {
+                root: gridRef.current, // ✅ 내부 스크롤 영역을 감시
+                rootMargin: '0px 0px 200px 0px',
+                threshold: 0.1,
+            }
+        );
+
+
+        observer.observe(sentinel);
+        console.log("🟢 observer.observe 실행 완료");
+
+        return () => {
+            observer.disconnect();
+            console.log("🔴 observer 해제됨");
+        };
+    }, [page, hasMore, loading, fetchDestinations]);
+
+
+    useEffect(() => {
+        const grid = gridRef.current;
+        if (!grid) {
+            return;
+        }
+
+        grid.style.overflowX = showEndModal ? 'hidden' : '';
+
+        return () => {
+            grid.style.overflowX = '';
+        };
+    }, [showEndModal]);
+
 
     // 테스트용: 강제로 선택 상태 설정 (나중에 제거)
     useEffect(() => {
@@ -218,6 +314,11 @@ const ContentList: NextPage = () => {
     };
 
 
+    const getDisplayTitle = (title: string = ''): string => {
+        if (!title) return '';
+        return title.length > 18 ? `${title.slice(0, 18)}...` : title;
+    };
+
     return (
         <ProtectedRoute>
             <div>
@@ -233,8 +334,8 @@ const ContentList: NextPage = () => {
                 <div className={styles.container}>
                     <Header
                         backgroundColor="#FFE135"
-                        leftIcons={['🛟', '🧴']}
-                        rightIcons={['🏮', '🏄', '🏐']}
+                        leftImage={{ src: '/headerimg/yellowLeft.png', alt: 'Content List' }}
+                        rightImage={{ src: '/headerimg/yellowRight.png', alt: 'Content List' }}
                         title="가고 싶은 곳을 선택해보세요!"
                         leftButton={{
                             text: "돌아가기",
@@ -278,8 +379,11 @@ const ContentList: NextPage = () => {
                                 </button>
                             </div>
                         ) : (
-                            <div className={styles.destinationGrid}>
+                            <div className={styles.destinationGrid} ref={gridRef}>
                                 {destinations.map((destination) => {
+                                    if (!destination.photoUrl) {
+                                        return null;
+                                    }
                                     // console.log('=== 개별 여행지 정보 ===');
                                     // console.log('ID:', destination.contentId);
                                     // console.log('제목:', destination.title);
@@ -314,7 +418,9 @@ const ContentList: NextPage = () => {
                                                 </div>
                                             </div>
                                             <div className={styles.cardContent}>
-                                                <h3 className={styles.cardTitle}>{destination.title}</h3>
+                                                <h3 className={styles.cardTitle} title={destination.title}>
+                                                    {getDisplayTitle(destination.title)}
+                                                </h3>
                                                 <div className={styles.ratingContainer}>
                                                     <span className={styles.rating}>
                                                         ⭐ {(destination.rating || 0).toFixed(1)}
@@ -327,7 +433,37 @@ const ContentList: NextPage = () => {
                                         </div>
                                     );
                                 })}
+                                {isFetchingMore && (
+                                    <div className={styles.loadingCard}>
+                                        <div className={`${styles.spinner} ${styles.spinnerSmall}`} />
+                                        <span>여행지를 불러오는 중...</span>
+                                    </div>
+                                )}
+                                <div
+                                    ref={loadMoreRef}
+                                    className={`${styles.loadMoreTrigger} ${!hasMore ? styles.hiddenTrigger : ''}`}
+                                />
                             </div>
+                        )}
+                        {showEndModal && (
+                            <>
+                                <div
+                                    className={styles.modalOverlay}
+                                    onClick={() => setShowEndModal(false)}
+                                />
+                                <div className={styles.endModal}>
+                                    <h3 className={styles.endModalTitle}>모든 여행지를 확인했어요!</h3>
+                                    <p className={styles.endModalMessage}>
+                                        새로운 여행지가 더 이상 없어요. 다른 지역이나 카테고리를 선택해볼까요?
+                                    </p>
+                                    <button
+                                        className={styles.endModalButton}
+                                        onClick={() => setShowEndModal(false)}
+                                    >
+                                        닫기
+                                    </button>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>

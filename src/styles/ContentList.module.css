@@ -133,7 +133,7 @@
 
 .cardImage {
     width: 100%;
-    aspect-ratio: 1 / 0.7;
+    aspect-ratio: 1 / 0.95;
     background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
     display: flex;
     align-items: center;
@@ -289,6 +289,111 @@
     }
 }
 
+.spinnerSmall {
+    width: 28px;
+    height: 28px;
+    border-width: 3px;
+    margin-bottom: 4px;
+}
+
+.loadMoreTrigger {
+    width: 1px;
+    height: 100%;
+    background: transparent;
+    flex-shrink: 0;
+}
+
+.loadingCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 280px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 2px dashed rgba(51, 51, 51, 0.2);
+    border-radius: 20px;
+    box-shadow: inset 0 0 0 1px rgba(255, 209, 53, 0.1);
+    color: #666;
+    font-size: 0.9rem;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.hiddenTrigger {
+    display: none;
+}
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 200;
+}
+
+.endModal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 360px;
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    z-index: 210;
+    border: 2px solid #FFE135;
+}
+
+.endModalTitle {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+.endModalMessage {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.endModalButton {
+    background: linear-gradient(135deg, #FFE135, #FFD700);
+    color: #333;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.endModalButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(255, 225, 53, 0.35);
+}
+
+.endModalButton:active {
+    transform: translateY(0);
+}
+
+.loadMoreStatus {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+    min-height: 40px;
+    color: #666;
+    gap: 6px;
+    font-size: 0.9rem;
+}
+
 .errorContainer {
     display: flex;
     flex-direction: column;
@@ -331,9 +436,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 20px;
     text-align: center;
-    min-height: 400px;
+    min-height: calc(100vh - 150px);
+    padding: 40px 20px;
 }
 
 .emptyIcon {
@@ -429,6 +534,19 @@
         overflow-y: hidden;
     }
 
+    .endModal {
+        max-width: 320px;
+        padding: 22px;
+    }
+
+    .endModalTitle {
+        font-size: 1.2rem;
+    }
+
+    .endModalMessage {
+        font-size: 0.9rem;
+    }
+
     .cardImage {
         width: 100%;
         aspect-ratio: 1 / 0.85;
@@ -469,6 +587,18 @@
         overflow-y: hidden;
     }
 
+    .endModal {
+        padding: 20px;
+    }
+
+    .endModalTitle {
+        font-size: 1.15rem;
+    }
+
+    .endModalMessage {
+        font-size: 0.88rem;
+    }
+
     .destinationCard {
         width: 250px;
         height: 300px;
@@ -476,7 +606,7 @@
 
     .cardImage {
         width: 100%;
-        aspect-ratio: 1 / 0.9;
+        aspect-ratio: 1 / 0.95;
     }
 
     .emoji {
@@ -534,7 +664,7 @@
 
     .cardImage {
         width: 100%;
-        aspect-ratio: 1 / 0.85;
+        aspect-ratio: 1 / 0.95;
     }
 
     .cardContent {

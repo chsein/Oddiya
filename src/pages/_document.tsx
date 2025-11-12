@@ -16,6 +16,12 @@ export default function Document() {
                 <meta name="msapplication-TileColor" content="#00FFAA" />
                 <meta name="msapplication-tap-highlight" content="no" />
                 <meta name="theme-color" content="#00FFAA" />
+                
+                {/* Force Landscape Orientation */}
+                <meta name="screen-orientation" content="landscape" />
+                <meta name="x5-orientation" content="landscape" />
+                <meta name="x5-fullscreen" content="true" />
+                <meta name="full-screen" content="yes" />
 
                 {/* PWA Icons */}
                 <link rel="apple-touch-icon" href="/icons/icon-152x152.png" />

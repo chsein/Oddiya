@@ -1,0 +1,427 @@
+/* VideoList 페이지 스타일 - Record와 동일한 테마 */
+.container {
+    min-height: 100vh;
+    background: #CEF4F7;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.content {
+    flex: 1;
+    padding: 30px;
+    height: calc(100vh - 80px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* 빈 상태 스타일 */
+.emptyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    flex: 1;
+}
+
+.emptyIcon {
+    font-size: 5rem;
+    margin-bottom: 30px;
+    opacity: 0.7;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.emptyTitle {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.emptyDescription {
+    font-size: 1.2rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* 로딩 상태 스타일 */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    flex: 1;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(0, 238, 255, 0.3);
+    border-top-color: #00EEFF;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 에러 메시지 스타일 */
+.errorContainer {
+    background: rgba(255, 87, 87, 0.1);
+    border: 2px solid #ff5757;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.errorMessage {
+    color: #d32f2f;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.retryButton {
+    background: linear-gradient(135deg, #ffffff 50%, #00EEFF 100%);
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.retryButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #00EEFF;
+}
+
+/* 영상 갤러리 스타일 - 가로 스크롤 */
+.videoGallery {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 20px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+}
+
+/* 스크롤바 스타일 */
+.videoGallery::-webkit-scrollbar {
+    height: 8px;
+}
+
+.videoGallery::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.videoGallery::-webkit-scrollbar-thumb {
+    background: #00EEFF;
+    border-radius: 4px;
+}
+
+.videoGallery::-webkit-scrollbar-thumb:hover {
+    background: #00CCE0;
+}
+
+.videoCard {
+    background: white;
+    border-radius: 15px;
+    border: 2px solid #333;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    flex-shrink: 0; /* 카드가 줄어들지 않도록 */
+    width: 280px; /* 고정 너비 */
+    scroll-snap-align: start; /* 스크롤 스냅 정렬 */
+}
+
+.videoCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border-color: #00EEFF;
+}
+
+.videoCard:active {
+    transform: translateY(-2px);
+}
+
+.videoThumbnail {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.playIcon {
+    font-size: 3rem;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* 렌더링 중 아이콘 애니메이션 */
+.videoCard[data-status="RENDERING"] .playIcon {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.cardDeleteButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: 2px solid white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.cardDeleteButton:hover {
+    background: rgba(200, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+.cardDeleteButton:active {
+    transform: scale(0.95);
+}
+
+.videoInfo {
+    padding: 15px;
+}
+
+.videoMeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.videoDate {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* 진행률 표시 */
+.progressContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.progressBar {
+    flex: 1;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #00EEFF, #0099CC);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 238, 255, 0.4);
+}
+
+.progressText {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #00EEFF;
+    min-width: 35px;
+    text-align: right;
+}
+
+/* 상태 배지 스타일 */
+.statusBadge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 2px solid;
+}
+
+.badgeSuccess {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: #4caf50;
+}
+
+.badgeWarning {
+    background: #fff3e0;
+    color: #e65100;
+    border-color: #ff9800;
+}
+
+.badgeDanger {
+    background: #ffebee;
+    color: #c62828;
+    border-color: #f44336;
+}
+
+.badgeSecondary {
+    background: #f5f5f5;
+    color: #616161;
+    border-color: #9e9e9e;
+}
+
+/* 영상 재생 모달 스타일 */
+.videoModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.modalContent {
+    max-width: 90vw;
+    max-height: 90vh;
+    position: relative;
+    animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modalVideoContainer {
+    position: relative;
+    background: black;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 3px solid #00EEFF;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modalVideo {
+    display: block;
+    max-width: 90vw;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+}
+
+.modalCloseButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: 2px solid white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.modalCloseButton:hover {
+    background: rgba(255, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+.modalDeleteButton {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: 2px solid white;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.modalDeleteButton:hover {
+    background: rgba(200, 0, 0, 0.9);
+    transform: scale(1.05);
+}
+
+.modalDeleteButton:active {
+    transform: scale(0.98);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .videoCard {
+        width: 220px; /* 모바일에서 카드 너비 축소 */
+    }
+
+    .videoGallery {
+        gap: 15px;
+    }
+
+    .emptyTitle {
+        font-size: 1.5rem;
+    }
+
+    .emptyDescription {
+        font-size: 1rem;
+    }
+}

@@ -28,8 +28,8 @@ const Main: NextPage = () => {
             }}>
                 <Header
                     backgroundColor="#FF6B6B"
-                    leftIcons={['🎉', '🎨']}
-                    rightIcons={['📱', '✨']}
+                    leftImage={{ src: '/headerimg/greenLeft.png', alt: 'Main' }}
+                    rightImage={{ src: '/headerimg/greenRight.png', alt: 'Main' }}
                     title="WELCOME"
                 />
 

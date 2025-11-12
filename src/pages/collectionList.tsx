@@ -121,8 +121,8 @@ const CollectionList: NextPage = () => {
             <div className={styles.container}>
                 <Header
                     backgroundColor="#FFE135"
-                    leftIcons={['🛟', '🧴']}
-                    rightIcons={['🏮', '🏄', '🏐']}
+                    leftImage={{ src: '/headerimg/yellowLeft.png', alt: 'Collection List' }}
+                    rightImage={{ src: '/headerimg/yellowRight.png', alt: 'Collection List' }}
                     title="내 여행지 컬렉션"
                     subtitle={`${basketItems.length}개의 선택된 여행지`}
                     leftButton={{
