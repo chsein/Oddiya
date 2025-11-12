@@ -7,11 +7,13 @@
 .content {
     padding: 20px;
     min-height: calc(100vh - 70px);
+    height: calc(100vh - 70px);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     position: relative;
+    box-sizing: border-box;
 }
 
 
@@ -138,10 +140,14 @@
     overflow-y: hidden;
     gap: 20px;
     padding: 20px;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: calc(0.8 * (100vh - 70px));
     scrollbar-width: thin;
     scrollbar-color: #00FFAA #f0f0f0;
     width: 100%;
     -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
 }
 
 .tripGrid::-webkit-scrollbar {
@@ -164,15 +170,18 @@
 
 .tripCard {
     flex-shrink: 0;
-    width: 230px;
-    height: 230px;
+    --trip-card-size: min(80vw, calc(0.8 * (100vh - 70px)), 320px);
+    width: var(--trip-card-size);
+    height: var(--trip-card-size);
     background: white;
-    border-radius: 20px;
+    border-radius: 10px;
     overflow: hidden;
     transition: all 0.3s ease;
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    border: 2px solid rgba(82, 82, 82, 0.8);
 }
 
 .tripCard:hover {
@@ -182,21 +191,29 @@
 
 .cardImage {
     flex: 1;
-    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    overflow: hidden;
 }
 
-.emoji {
-    font-size: 3rem;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+.cardImageTag {
+    width: 90%;
+    height: 90%;
+    object-fit: cover;
+    display: block;
+    border-radius: 5px;
 }
 
 .cardContent {
     padding: 15px;
     background: white;
+    border-top: 1px solid transparent;
+    border-image: linear-gradient(90deg,
+            rgba(82, 82, 82, 0) 0%,
+            rgba(82, 82, 82, 0.8) 50%,
+            rgba(82, 82, 82, 0) 100%) 1;
 }
 
 .cardTitle {
@@ -228,15 +245,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        height: calc(100vh - 70px);
     }
 
     .tripGrid {
         overflow-x: auto;
         overflow-y: hidden;
-    }
-
-    .emoji {
-        font-size: 2.5rem;
     }
 
     .cardTitle {
@@ -280,15 +294,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        height: calc(100vh - 70px);
     }
 
     .tripGrid {
         overflow-x: auto;
         overflow-y: hidden;
-    }
-
-    .emoji {
-        font-size: 2rem;
     }
 
     .cardContent {
@@ -348,19 +359,22 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        box-sizing: border-box;
     }
 
     .tripGrid {
-        height: calc(100vh - 90px);
+        max-height: calc(100vh - 90px);
         padding: 10px;
-        gap: 12px;
+        gap: 20px;
         overflow-x: auto;
         overflow-y: hidden;
     }
 
     .tripCard {
-        width: 180px;
-        height: 180px;
+        height: var(--trip-card-size);
+        width: var(--trip-card-size);
+        border-color: #666;
+        border-width: 2px;
     }
 
     .cardContent {
@@ -379,10 +393,6 @@
 
     .cardDateRange {
         font-size: 0.7rem;
-    }
-
-    .emoji {
-        font-size: 2rem;
     }
 
     .emptyState {

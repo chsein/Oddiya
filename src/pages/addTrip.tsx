@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import type { AxiosError } from "axios";
 import Header from "../components/Header";
 import ProtectedRoute from "../components/ProtectedRoute";
 import styles from "../styles/AddTrip.module.css";
@@ -9,6 +10,10 @@ import { createTrip, CreateTripRequest } from "../helpers/api";
 
 const AddTrip: NextPage = () => {
     const router = useRouter();
+    const getErrorMessage = (err: unknown, fallback: string) => {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        return axiosError.response?.data?.message || fallback;
+    };
     const [tripData, setTripData] = useState({
         destinationCity: '',
         startDate: '',
@@ -20,6 +25,7 @@ const AddTrip: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [showCitySuggestions, setShowCitySuggestions] = useState(false);
     const [citySearchTerm, setCitySearchTerm] = useState('');
+    const [errorModalMessage, setErrorModalMessage] = useState<string | null>(null);
 
     // 도시 목록
     const cities = [
@@ -116,11 +122,23 @@ const AddTrip: NextPage = () => {
                 validDateRange: true
             };
 
-            await createTrip(tripRequest);
-            router.push('/tripList');
+            const result = await createTrip(tripRequest);
+            if (typeof result === 'string') {
+                setErrorModalMessage(result);
+                console.log('🚗 Error modal message:', result);
+
+            } else {
+                setShowNameModal(false);
+                router.push('/tripList');
+            }
+
         } catch (err) {
             console.error('Error creating trip:', err);
-            setError('여행 생성에 실패했습니다. 다시 시도해주세요.');
+            const axiosError = err as AxiosError<{ message?: string }>;
+            const message = axiosError.response?.data?.message || getErrorMessage(err, '여행 생성에 실패했습니다. 다시 시도해주세요.');
+            setShowNameModal(false);
+            setError(null);
+            setErrorModalMessage(message);
         } finally {
             setLoading(false);
         }
@@ -130,6 +148,11 @@ const AddTrip: NextPage = () => {
         setShowNameModal(false);
         setTripName('');
         setError(null);
+    };
+
+    const handleErrorModalClose = () => {
+        setErrorModalMessage(null);
+        router.reload();
     };
 
     return (
@@ -145,177 +168,204 @@ const AddTrip: NextPage = () => {
                     <link rel="icon" href="/favicon.ico" />
                 </Head>
                 <div className={styles.container}>
-                <Header
-                    backgroundColor="#00FFAA"
-                    leftIcons={['←', '📝']}
-                    rightIcons={['💾', '❌']}
-                    title="새로운 여행 시작하기"
-                    showTripListButton={true}
-                    onTripListClick={handleBack}
-                    leftButton={{
-                        text: "취소",
-                        onClick: handleBack
-                    }}
+                    <Header
+                        backgroundColor="#00FFAA"
+                        leftImage={{ src: '/headerimg/greenLeft.png', alt: 'Login' }}
+                        rightImage={{ src: '/headerimg/greenRight.png', alt: 'Login' }}
+                        title="새로운 여행 시작하기"
+                        showTripListButton={true}
+                        onTripListClick={handleBack}
+                        leftButton={{
+                            text: "취소",
+                            onClick: handleBack
+                        }}
 
-                />
+                    />
 
-                <div className={styles.content}>
-                    <div className={styles.ticketContainer}>
-                        <form onSubmit={handleSubmit} className={styles.ticket}>
-                            <div className={styles.ticketHeader}>
-                                <h1 className={styles.ticketTitle}>Oddiya</h1>
-                            </div>
-
-                            <div className={styles.ticketBody}>
-                                <div className={styles.barcode}>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
-                                    <div className={styles.barcodeLine}></div>
+                    <div className={styles.content}>
+                        <div className={styles.ticketContainer}>
+                            <form onSubmit={handleSubmit} className={styles.ticket}>
+                                <div className={styles.ticketHeader}>
+                                    <h1 className={styles.ticketTitle}>Oddiya</h1>
                                 </div>
 
-                                <div className={styles.ticketContent}>
-                                    <div className={styles.questionGroup}>
-                                        <p className={styles.question}>어디로 떠나시나요?</p>
-                                        <div className={styles.citySearchContainer}>
-                                            <input
-                                                type="text"
-                                                name="destinationCity"
-                                                value={citySearchTerm}
-                                                onChange={handleCitySearch}
-                                                onFocus={handleCityInputFocus}
-                                                onBlur={handleCityInputBlur}
-                                                className={styles.ticketInput}
-                                                placeholder="도시를 검색하세요 (예: 서울, 제주)"
-                                                required
-                                            />
-                                            {showCitySuggestions && filteredCities.length > 0 && (
-                                                <div className={styles.citySuggestions}>
-                                                    {filteredCities.slice(0, 5).map((city) => (
-                                                        <div
-                                                            key={city}
-                                                            className={styles.citySuggestionItem}
-                                                            onClick={() => handleCitySelect(city)}
-                                                        >
-                                                            {city}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
+                                <div className={styles.ticketBody}>
+                                    <div className={styles.barcode}>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
+                                        <div className={styles.barcodeLine}></div>
                                     </div>
 
-                                    <div className={styles.questionGroup}>
-                                        <p className={styles.question}>여행일자를 선택해주세요</p>
-                                        <div className={styles.dateRangeContainer}>
-                                            <input
-                                                type="date"
-                                                name="startDate"
-                                                value={tripData.startDate}
-                                                onChange={handleInputChange}
-                                                className={styles.dateInput}
-                                                min={new Date().toISOString().split('T')[0]}
-                                                required
-                                            />
-                                            <span className={styles.dateSeparator}>~</span>
-                                            <input
-                                                type="date"
-                                                name="endDate"
-                                                value={tripData.endDate}
-                                                onChange={handleInputChange}
-                                                className={styles.dateInput}
-                                                min={tripData.startDate || new Date().toISOString().split('T')[0]}
-                                                required
-                                            />
+                                    <div className={styles.ticketContent}>
+                                        <div className={styles.questionGroup}>
+                                            <p className={styles.question}>어디로 떠나시나요?</p>
+                                            <div className={styles.citySearchContainer}>
+                                                <input
+                                                    type="text"
+                                                    name="destinationCity"
+                                                    value={citySearchTerm}
+                                                    onChange={handleCitySearch}
+                                                    onFocus={handleCityInputFocus}
+                                                    onBlur={handleCityInputBlur}
+                                                    className={styles.ticketInput}
+                                                    placeholder="도시를 검색하세요 (예: 서울, 제주)"
+                                                    required
+                                                />
+                                                {showCitySuggestions && filteredCities.length > 0 && (
+                                                    <div className={styles.citySuggestions}>
+                                                        {filteredCities.slice(0, 5).map((city) => (
+                                                            <div
+                                                                key={city}
+                                                                className={styles.citySuggestionItem}
+                                                                onClick={() => handleCitySelect(city)}
+                                                            >
+                                                                {city}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className={styles.questionGroup}>
+                                            <p className={styles.question}>여행일자를 선택해주세요</p>
+                                            <div className={styles.dateRangeContainer}>
+                                                <input
+                                                    type="date"
+                                                    name="startDate"
+                                                    value={tripData.startDate}
+                                                    onChange={handleInputChange}
+                                                    className={styles.dateInput}
+                                                    min={new Date().toISOString().split('T')[0]}
+                                                    required
+                                                />
+                                                <span className={styles.dateSeparator}>~</span>
+                                                <input
+                                                    type="date"
+                                                    name="endDate"
+                                                    value={tripData.endDate}
+                                                    onChange={handleInputChange}
+                                                    className={styles.dateInput}
+                                                    min={tripData.startDate || new Date().toISOString().split('T')[0]}
+                                                    required
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className={styles.ticketActions}>
-                                <button
-                                    type="button"
-                                    onClick={handleBack}
-                                    className={styles.cancelButton}
-                                >
-                                    취소
-                                </button>
-                                <button
-                                    type="submit"
-                                    className={styles.submitButton}
-                                >
-                                    여행 시작하기
-                                </button>
-                            </div>
-                        </form>
-
-                        {/* 에러 메시지 */}
-                        {error && (
-                            <div className={styles.errorMessage}>
-                                {error}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* 여행 이름 입력 모달 */}
-                {showNameModal && (
-                    <div className={styles.modalOverlay} onClick={handleModalClose}>
-                        <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                            <div className={styles.modalHeader}>
-                                <h3 className={styles.modalTitle}>여행의 이름을 지어주세요!</h3>
-                                <button
-                                    className={styles.closeButton}
-                                    onClick={handleModalClose}
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                            <div className={styles.modalBody}>
-                                <input
-                                    type="text"
-                                    value={tripName}
-                                    onChange={(e) => setTripName(e.target.value)}
-                                    className={styles.nameInput}
-                                    placeholder="예: 제주도 힐링 여행"
-                                    maxLength={50}
-                                    autoFocus
-                                />
-                                <div className={styles.modalActions}>
+                                <div className={styles.ticketActions}>
                                     <button
+                                        type="button"
+                                        onClick={handleBack}
                                         className={styles.cancelButton}
-                                        onClick={handleModalClose}
                                     >
                                         취소
                                     </button>
                                     <button
-                                        className={styles.confirmButton}
-                                        onClick={handleCreateTrip}
-                                        disabled={loading}
+                                        type="submit"
+                                        className={styles.submitButton}
                                     >
-                                        {loading ? '생성 중...' : '여행 생성하기'}
+                                        여행 시작하기
                                     </button>
+                                </div>
+                            </form>
+
+                            {/* 에러 메시지 */}
+                            {error && (
+                                <div className={styles.errorMessage}>
+                                    {error}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* 여행 이름 입력 모달 */}
+                    {showNameModal && (
+                        <div className={styles.modalOverlay} onClick={handleModalClose}>
+                            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                                <div className={styles.modalHeader}>
+                                    <h3 className={styles.modalTitle}>여행의 이름을 지어주세요!</h3>
+                                    <button
+                                        className={styles.closeButton}
+                                        onClick={handleModalClose}
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                <div className={styles.modalBody}>
+                                    <input
+                                        type="text"
+                                        value={tripName}
+                                        onChange={(e) => setTripName(e.target.value)}
+                                        className={styles.nameInput}
+                                        placeholder="예: 제주도 힐링 여행"
+                                        maxLength={50}
+                                        autoFocus
+                                    />
+                                    <div className={styles.modalActions}>
+                                        <button
+                                            className={styles.cancelButton}
+                                            onClick={handleModalClose}
+                                        >
+                                            취소
+                                        </button>
+                                        <button
+                                            className={styles.confirmButton}
+                                            onClick={handleCreateTrip}
+                                            disabled={loading}
+                                        >
+                                            {loading ? '생성 중...' : '여행 생성하기'}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+
+                    {errorModalMessage && (
+                        <div className={styles.modalOverlay} onClick={handleErrorModalClose}>
+                            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                                <div className={styles.modalHeader}>
+                                    <h3 className={styles.modalTitle}>여행을 생성할 수 없어요</h3>
+                                    <button
+                                        className={styles.closeButton}
+                                        onClick={handleErrorModalClose}
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                <div className={styles.modalBody}>
+                                    <p>{errorModalMessage}</p>
+                                    <div className={styles.modalActions}>
+                                        <button
+                                            className={styles.confirmButton}
+                                            onClick={handleErrorModalClose}
+                                        >
+                                            확인
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </ProtectedRoute>

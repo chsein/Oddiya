@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { getCurrentUserIdToken, refreshIdToken } from '../lib/firebase/auth';
 
 // API 관련 타입 정의
@@ -366,8 +366,8 @@ export const getTrips = async (): Promise<Trip[]> => {
 export const getTripById = async (tripId: string): Promise<Trip> => {
     try {
         const response = await apiClient.get(`/api/v1/trips/${tripId}`);
-        console.log('🚗 Trip detail API response:', response);
-        console.log('🚗 Trip data:', response.data);
+        // console.log('🚗 Trip detail API response:', response);
+        // console.log('🚗 Trip data:', response.data);
 
         // 실제 API 응답 구조에 맞게 수정
         if (response.data) {
@@ -397,20 +397,27 @@ export interface CreateTripRequest {
 }
 
 // 여행 생성 API
-export const createTrip = async (tripData: CreateTripRequest): Promise<Trip> => {
+export const createTrip = async (tripData: CreateTripRequest): Promise<Trip | null> => {
     try {
         const response: AxiosResponse<{ success: boolean; data: Trip; message: string; timestamp: string }> =
             await apiClient.post('/api/v1/trips', tripData);
         console.log('🚗 여행 생성 API 호출:', response.data);
         return response.data.data;
     } catch (error) {
-        console.error('Error creating trip:', error);
-        if (axios.isAxiosError(error)) {
-            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        if (error instanceof AxiosError) {
+            // 400번대 에러는 무시하고 그냥 넘어감
+            if (error.response && error.response.status >= 400 && error.response.status < 500) {
+
+                return error.response.data?.message;
+            }
         }
+
+        // 500번대 등 서버 오류는 그대로 throw
+        console.error('Error creating trip:', error);
         throw error;
     }
 };
+
 
 // 여행지 장바구니 추가 요청 타입
 export interface BasketItemRequest {

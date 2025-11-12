@@ -43,9 +43,30 @@ const ContentMenu: NextPage = () => {
         router.push('/tripList');
     };
 
-    const handleMenuClick = (menuType: string) => {
-        console.log(`Menu clicked: ${menuType}`);
-        // 여기서 각 메뉴에 따른 페이지로 이동
+    const menuItems = [
+        {
+            type: 'explore',
+            title: '여행지 둘러보기',
+            description: '지역별 여행지 탐색',
+        },
+        {
+            type: 'collection',
+            title: '관심 여행지 모아보기',
+            description: '찜한 여행지를 한눈에',
+        },
+        {
+            type: 'schedule',
+            title: '일정 생성하기',
+            description: 'AI가 잡아주는 여행 일정',
+        },
+        {
+            type: 'record',
+            title: '여행 기록하기',
+            description: '추억을 영상으로 남기기',
+        },
+    ] as const;
+
+    const handleMenuClick = (menuType: (typeof menuItems)[number]['type']) => {
         switch (menuType) {
             case 'explore':
                 // tripData에서 지역명 추출 (destinationCity 사용)
@@ -124,40 +145,25 @@ const ContentMenu: NextPage = () => {
                 />
 
                 <div className={styles.content}>
-
-
                     <div className={styles.menuGrid}>
-                        <div
-                            className={styles.menuItem}
-                            onClick={() => handleMenuClick('explore')}
-                        >
-                            <div className={styles.menuIcon}>🗺️</div>
-                            <h3 className={styles.menuTitle}>여행지 둘러보기</h3>
-                        </div>
-
-                        <div
-                            className={styles.menuItem}
-                            onClick={() => handleMenuClick('collection')}
-                        >
-                            <div className={styles.menuIcon}>⭐</div>
-                            <h3 className={styles.menuTitle}>관심 여행지 모아보기</h3>
-                        </div>
-
-                        <div
-                            className={styles.menuItem}
-                            onClick={() => handleMenuClick('schedule')}
-                        >
-                            <div className={styles.menuIcon}>📅</div>
-                            <h3 className={styles.menuTitle}>일정 생성하기</h3>
-                        </div>
-
-                        <div
-                            className={styles.menuItem}
-                            onClick={() => handleMenuClick('record')}
-                        >
-                            <div className={styles.menuIcon}>📝</div>
-                            <h3 className={styles.menuTitle}>여행 기록하기</h3>
-                        </div>
+                        {menuItems.map((item) => (
+                            <div
+                                key={item.type}
+                                className={styles.menuItem}
+                                onClick={() => handleMenuClick(item.type)}
+                            >
+                                <div className={styles.menuImageWrapper}>
+                                    <img
+                                        src={tripData.image || '/defaultpic.jpg'}
+                                        alt={item.title}
+                                        className={styles.menuImage}
+                                    />
+                                </div>
+                                <div className={styles.menuContent}>
+                                    <h3 className={styles.menuTitle}>{item.title}</h3>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>

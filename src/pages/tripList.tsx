@@ -129,8 +129,8 @@ const TripList: NextPage = () => {
 
                         {/* 여행 목록이 0개일 때 */}
                         {(() => {
-                            console.log('🚗 Empty state check - loading:', loading, 'error:', error, 'trips:', trips, 'trips.length:', trips?.length);
-                            console.log('🚗 Empty conditions - !loading:', !loading, '!error:', !error, 'Array.isArray(trips):', Array.isArray(trips), 'trips.length === 0:', trips?.length === 0);
+                            // console.log('🚗 Empty state check - loading:', loading, 'error:', error, 'trips:', trips, 'trips.length:', trips?.length);
+                            // console.log('🚗 Empty conditions - !loading:', !loading, '!error:', !error, 'Array.isArray(trips):', Array.isArray(trips), 'trips.length === 0:', trips?.length === 0);
                             return !loading && !error && Array.isArray(trips) && trips.length === 0;
                         })() && (
                                 <div className={styles.emptyState}>
@@ -148,8 +148,8 @@ const TripList: NextPage = () => {
 
                         {/* 여행 목록 */}
                         {(() => {
-                            console.log('🚗 Render check - loading:', loading, 'error:', error, 'trips:', trips, 'trips.length:', trips?.length);
-                            console.log('🚗 Conditions - !loading:', !loading, '!error:', !error, 'Array.isArray(trips):', Array.isArray(trips), 'trips.length > 0:', trips?.length > 0);
+                            // console.log('🚗 Render check - loading:', loading, 'error:', error, 'trips:', trips, 'trips.length:', trips?.length);
+                            // console.log('🚗 Conditions - !loading:', !loading, '!error:', !error, 'Array.isArray(trips):', Array.isArray(trips), 'trips.length > 0:', trips?.length > 0);
                             return !loading && !error && Array.isArray(trips) && trips.length > 0;
                         })() && (
                                 <div
@@ -162,7 +162,20 @@ const TripList: NextPage = () => {
                                             onClick={() => handleTripClick(trip.id)}
                                         >
                                             <div className={styles.cardImage}>
-                                                <span className={styles.emoji}>{trip.image || "✈️"}</span>
+                                                {(() => {
+                                                    const fallback = "/defaultpic.jpg";
+                                                    const imageSrc =
+                                                        typeof trip.image === "string" && /^https?:\/\//.test(trip.image)
+                                                            ? trip.image
+                                                            : fallback;
+                                                    return (
+                                                        <img
+                                                            src={imageSrc}
+                                                            alt={trip.tripName || trip.destinationCity || '기본 여행 이미지'}
+                                                            className={styles.cardImageTag}
+                                                        />
+                                                    );
+                                                })()}
                                             </div>
                                             <div className={styles.cardContent}>
                                                 <p className={styles.cardTitle}>{trip.tripName}/{trip.destinationCity}</p>

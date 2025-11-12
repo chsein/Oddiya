@@ -207,7 +207,6 @@ const Settings: NextPage = () => {
 
                             {/* 여행 삭제 섹션 */}
                             <div className={styles.section}>
-                                <h2 className={styles.sectionTitle}>🗑️ 위험 영역</h2>
                                 <button
                                     className={styles.deleteButton}
                                     onClick={handleDeleteTrip}
