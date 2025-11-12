@@ -152,9 +152,16 @@ const nextConfig = {
   },
   async rewrites() {
     return [
+      // 기존 API 요청 프록시
       {
         source: '/api/v1/:path*',
-        destination: 'http://3.38.40.164/api/v1/:path*', // 백엔드 주소
+        destination: 'http://3.38.40.164/api/v1/:path*', // ✅ HTTP 백엔드 (Vercel이 HTTPS로 감싸서 호출)
+      },
+
+      // 만약 이미지나 파일 URL도 있다면 같이 프록시
+      {
+        source: '/storage/:path*',
+        destination: 'http://3.38.40.164/storage/:path*', // ✅ HTTP 백엔드로 프록시
       },
     ];
   },

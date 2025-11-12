@@ -195,7 +195,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:8
 
 // axios 인스턴스 생성
 const apiClient = axios.create({
-    baseURL: "",
+    baseURL: "/api/v1",
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

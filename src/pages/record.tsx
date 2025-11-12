@@ -155,7 +155,8 @@ const Record: NextPage = () => {
                 console.log('✅ Pre-signed URL 생성 성공');
 
                 // 2. S3/MinIO에 직접 업로드
-                await uploadPhotoToS3(uploadUrlResponse.uploadUrl, file, file.type);
+                const httpsUrl = uploadUrlResponse.uploadUrl.replace("http://3.38.40.164", "/storage");
+                await uploadPhotoToS3(httpsUrl, file, file.type);
 
                 console.log('✅ S3 업로드 성공');
 
