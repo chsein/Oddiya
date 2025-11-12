@@ -150,6 +150,14 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: 'http://3.38.40.164/api/v1/:path*', // 백엔드 주소
+      },
+    ];
+  },
 };
 
 module.exports = withPWA(nextConfig);
