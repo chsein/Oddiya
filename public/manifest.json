@@ -6,7 +6,7 @@
     "display": "standalone",
     "background_color": "#CEF8DE",
     "theme_color": "#00FFAA",
-    "orientation": "portrait-primary",
+    "orientation": "landscape-primary",
     "scope": "/",
     "lang": "ko",
     "id": "/",

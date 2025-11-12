@@ -272,17 +272,32 @@ apiClient.interceptors.response.use(
     }
 );
 
-// 지역별 컨텐츠 조회 API (contentTypeId 옵션 추가)
-export const getContentsByRegion = async (regionName: string, contentTypeId?: number): Promise<ContentsResponse> => {
+// 지역별 컨텐츠 조회 API (contentTypeId, page 옵션 추가)
+export const getContentsByRegion = async (
+    regionName: string,
+    contentTypeId?: number,
+    page: number = 0,
+    size?: number
+): Promise<ContentsResponse> => {
     try {
-        const url = contentTypeId
-            ? `/api/v1/contents/regions/${regionName}?contentTypeId=${contentTypeId}`
-            : `/api/v1/contents/regions/${regionName}`;
+        const params: Record<string, any> = {
+            page,
+        };
 
-        console.log('🌍 API 호출 - Region:', regionName, 'ContentType:', contentTypeId || 'All');
+        if (typeof contentTypeId === 'number') {
+            params.contentTypeId = contentTypeId;
+        }
+
+        if (typeof size === 'number') {
+            params.size = size;
+        }
+
+        console.log('🌍 API 호출 - Region:', regionName, 'ContentType:', contentTypeId || 'All', 'Page:', page);
 
         // apiClient를 사용하여 Authorization 헤더 자동 포함
-        const response = await apiClient.get(url);
+        const response = await apiClient.get(`/api/v1/contents/regions/${regionName}`, {
+            params,
+        });
 
         return response.data;
     } catch (error) {
@@ -810,6 +825,44 @@ export const deleteVideo = async (
         console.log('🎬 비디오 삭제 성공:', videoId);
     } catch (error) {
         console.error('Error deleting video:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// 여행 삭제 API
+export const deleteTrip = async (tripId: string): Promise<void> => {
+    try {
+        await apiClient.delete(`/api/v1/trips/${tripId}`);
+        console.log('🚗 여행 삭제 성공:', tripId);
+    } catch (error) {
+        console.error('Error deleting trip:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// 여행 수정 요청 타입
+export interface UpdateTripRequest {
+    tripName?: string;
+    destinationCity?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+// 여행 수정 API
+export const updateTrip = async (tripId: string, tripData: UpdateTripRequest): Promise<Trip> => {
+    try {
+        const response: AxiosResponse<{ success: boolean; data: Trip; message: string; timestamp: string }> =
+            await apiClient.patch(`/api/v1/trips/${tripId}`, tripData);
+        console.log('🚗 여행 수정 성공:', response.data);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error updating trip:', error);
         if (axios.isAxiosError(error)) {
             throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
         }

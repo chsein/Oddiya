@@ -1,10 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import styles from '../styles/Header.module.css';
+
+interface SideImage {
+    src: string;
+    alt?: string;
+}
 
 interface HeaderProps {
     backgroundColor?: string;
     leftIcons?: string[];
     rightIcons?: string[];
+    leftImage?: SideImage;
+    rightImage?: SideImage;
     title: string;
     subtitle?: string;
     showTripListButton?: boolean;
@@ -26,6 +33,8 @@ const Header: React.FC<HeaderProps> = ({
     backgroundColor = '#00FFAA',
     leftIcons = ['🎨', '⚡'],
     rightIcons = ['📱', '✨'],
+    leftImage,
+    rightImage,
     title = 'ODDIYA',
     subtitle,
     showTripListButton = false,
@@ -35,54 +44,26 @@ const Header: React.FC<HeaderProps> = ({
     leftButton,
     rightButton
 }) => {
-    const titleRef = useRef<HTMLHeadingElement>(null);
-    const [fontSize, setFontSize] = useState('2.2rem');
-
-    useEffect(() => {
-        const adjustFontSize = () => {
-            if (titleRef.current) {
-                const element = titleRef.current;
-                const container = element.parentElement;
-
-                if (container) {
-                    // 컨테이너의 실제 사용 가능한 너비
-                    const containerWidth = container.offsetWidth;
-                    const availableWidth = containerWidth * 0.8; // 80% 사용 가능
-
-                    // 초기 폰트 사이즈로 시작
-                    element.style.fontSize = '2.2rem';
-
-                    // 텍스트가 넘치면 폰트 사이즈를 줄임
-                    let currentSize = 2.2;
-                    while (element.scrollWidth > availableWidth && currentSize > 0.8) {
-                        currentSize -= 0.05;
-                        element.style.fontSize = `${currentSize}rem`;
-                    }
-
-                    setFontSize(element.style.fontSize);
-                }
-            }
-        };
-
-        // DOM이 완전히 렌더링된 후 실행
-        const timeoutId = setTimeout(adjustFontSize, 50);
-        window.addEventListener('resize', adjustFontSize);
-
-        return () => {
-            clearTimeout(timeoutId);
-            window.removeEventListener('resize', adjustFontSize);
-        };
-    }, [title]);
     return (
         <header className={styles.header} style={{ backgroundColor }}>
             <div className={styles.headerContent}>
                 {/* 왼쪽 아이콘들 */}
                 <div className={styles.leftIcons}>
-                    {leftIcons.map((icon, index) => (
-                        <div key={index} className={styles.iconContainer}>
-                            <span className={styles.icon}>{icon}</span>
+                    {leftImage ? (
+                        <div className={styles.imageContainer}>
+                            <img
+                                src={leftImage.src}
+                                alt={leftImage.alt ?? 'Left decoration'}
+                                className={styles.sideImage}
+                            />
                         </div>
-                    ))}
+                    ) : (
+                        leftIcons.map((icon, index) => (
+                            <div key={index} className={styles.iconContainer}>
+                                <span className={styles.icon}>{icon}</span>
+                            </div>
+                        ))
+                    )}
                 </div>
 
                 {/* 왼쪽 버튼 */}
@@ -99,7 +80,7 @@ const Header: React.FC<HeaderProps> = ({
 
                 {/* 중간 제목 */}
                 <div className={styles.logo}>
-                    <h1 ref={titleRef} style={{ fontSize }}>{title}</h1>
+                    <h1>{title}</h1>
                     {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
                 </div>
 
@@ -118,11 +99,21 @@ const Header: React.FC<HeaderProps> = ({
 
                 {/* 오른쪽 아이콘들 */}
                 <div className={styles.rightIcons}>
-                    {rightIcons.map((icon, index) => (
-                        <div key={index} className={styles.iconContainer}>
-                            <span className={styles.icon}>{icon}</span>
+                    {rightImage ? (
+                        <div className={styles.imageContainer}>
+                            <img
+                                src={rightImage.src}
+                                alt={rightImage.alt ?? 'Right decoration'}
+                                className={styles.sideImage}
+                            />
                         </div>
-                    ))}
+                    ) : (
+                        rightIcons.map((icon, index) => (
+                            <div key={index} className={styles.iconContainer}>
+                                <span className={styles.icon}>{icon}</span>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
 

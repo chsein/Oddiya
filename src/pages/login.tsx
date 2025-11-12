@@ -184,8 +184,8 @@ const Login: NextPage = () => {
             <div className={styles.container}>
                 <Header
                     backgroundColor="#00FFAA"
-                    leftIcons={['🔐', '👤']}
-                    rightIcons={['⚙️', '❓']}
+                    leftImage={{ src: '/headerimg/greenLeft.png', alt: 'Login' }}
+                    rightImage={{ src: '/headerimg/greenRight.png', alt: 'Login' }}
                     title="로그인 하기"
                     leftButton={{
                         text: "뒤로가기",

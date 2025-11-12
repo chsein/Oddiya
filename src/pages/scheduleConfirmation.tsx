@@ -309,10 +309,10 @@ const ScheduleConfirmation: NextPage = () => {
             <div className={styles.container}>
                 <Header
                     backgroundColor="#00EEFF"
-                    leftIcons={['🛟', '🧴']}
-                    rightIcons={['🏮', '🏄', '🏐']}
+                    leftImage={{ src: '/headerimg/blue Left.png', alt: 'Schedule Confirmation' }}
+                    rightImage={{ src: '/headerimg/blueRight.png', alt: 'Schedule Confirmation' }}
                     title="일정을 확인 하세요!"
-                    subtitle="제주도 서귀포시"
+                    subtitle={itinerary?.destinationCity || ''}
                     leftButton={{
                         text: "돌아가기",
                         onClick: handleBack

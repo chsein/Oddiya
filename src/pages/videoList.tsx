@@ -242,8 +242,8 @@ const VideoList: NextPage = () => {
                 <div className={styles.container}>
                     <Header
                         backgroundColor="#00EEFF"
-                        leftIcons={['⛰️']}
-                        rightIcons={['☁️', '⚓']}
+                        leftImage={{ src: '/headerimg/blue Left.png', alt: 'Video List' }}
+                        rightImage={{ src: '/headerimg/blueRight.png', alt: 'Video List' }}
                         title="영상 목록"
                         leftButton={{
                             text: "돌아가기",
@@ -327,7 +327,7 @@ const VideoList: NextPage = () => {
                                             ) : (
                                                 <div className={styles.playIcon}>
                                                     {video.status === 'RENDERING' ? '⏳' :
-                                                     video.status === 'FAILED' ? '❌' : '📹'}
+                                                        video.status === 'FAILED' ? '❌' : '📹'}
                                                 </div>
                                             )}
                                         </div>
