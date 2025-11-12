@@ -1,5 +1,5 @@
-import { AbsoluteFill, Audio, Img, useCurrentFrame, useVideoConfig } from 'remotion';
-import { useMemo, useState, useEffect } from 'react';
+import { AbsoluteFill, Audio, Img, useCurrentFrame, useVideoConfig, staticFile } from 'remotion';
+import { useMemo } from 'react';
 import { z } from "zod";
 import { CompositionProps } from "../../../types/constants";
 
@@ -59,16 +59,21 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
         images: safeImages.slice(0, 3) // 처음 3개만 로그
     });
 
-    // 매번 다른 시드를 생성하기 위해 useState 사용
-    const [randomSeed, setRandomSeed] = useState(() => {
-        const imageHash = safeImages.reduce((acc, img) => acc + (img?.url || '').length, 0);
-        return Date.now() + Math.random() * 1000 + (tripId ? tripId.toString().length : 0) + imageHash;
-    });
+    // tripId 기반 deterministic seed 생성 (프론트/백엔드 일관성 보장)
+    const randomSeed = useMemo(() => {
+        if (!tripId) return 12345; // fallback seed
 
-    // 컴포넌트가 마운트될 때마다 새로운 시드 생성
-    useEffect(() => {
-        const imageHash = safeImages.reduce((acc, img) => acc + (img?.url || '').length, 0);
-        setRandomSeed(Date.now() + Math.random() * 1000 + (tripId ? tripId.toString().length : 0) + imageHash);
+        // tripId를 숫자로 변환 (UUID의 경우 해시값 사용)
+        let seed = 0;
+        for (let i = 0; i < tripId.length; i++) {
+            seed = ((seed << 5) - seed) + tripId.charCodeAt(i);
+            seed = seed & seed; // Convert to 32bit integer
+        }
+
+        // 이미지 개수를 추가하여 seed 다양성 확보
+        seed = seed + safeImages.length * 1000;
+
+        return Math.abs(seed);
     }, [tripId, safeImages.length]);
 
     const renderItems = useMemo(() => {
@@ -91,8 +96,8 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
             startFrame: number;
         }> = [];
 
-        // 사용 가능한 이미지 중에서 랜덤으로 선택하는 함수
-        const getRandomImageIndex = (orientation?: 'landscape' | 'portrait', avoidRecent: boolean = true): number => {
+        // seed 기반 deterministic 이미지 선택 함수 (프론트/백엔드 일관성 보장)
+        const getRandomImageIndex = (seed: number, orientation?: 'landscape' | 'portrait', avoidRecent: boolean = true): number => {
             // orientation에 맞는 이미지 필터링
             let candidateImages = orientation
                 ? safeImages.filter((img, idx) => img?.orientation === orientation)
@@ -114,8 +119,8 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
                 availableImages = candidateImages;
             }
 
-            // 완전 랜덤 선택
-            const randomIndex = Math.floor(Math.random() * availableImages.length);
+            // seed 기반 deterministic 선택
+            const randomIndex = getSeededRandomInt(seed, 0, availableImages.length - 1);
             const selectedImage = availableImages[randomIndex];
             const originalIndex = safeImages.indexOf(selectedImage);
 
@@ -179,7 +184,7 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
                 items.push({
                     groupIndex,
                     layout: 'single',
-                    imgIndex: getRandomImageIndex('landscape'),
+                    imgIndex: getRandomImageIndex(randomSeed + groupIndex * 100, 'landscape'),
                     zIndex: groupIndex,
                     startFrame,
                 });
@@ -193,14 +198,14 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
                 const count = 4;
                 console.log(`🎯 Grid layout - type: ${gridType}, count: ${count}, groupIndex: ${groupIndex}`);
 
-                // 그리드용 이미지들을 랜덤으로 선택
+                // 그리드용 이미지들을 seed 기반으로 선택
                 for (let i = 0; i < count; i++) {
                     if (beatIdx + i >= timingData.beat_times.length) break;
                     const orientation = gridType === '2x2' ? 'landscape' : 'portrait';
                     items.push({
                         groupIndex,
                         layout: 'gridImage',
-                        imgIndex: getRandomImageIndex(orientation), // 완전 랜덤 선택
+                        imgIndex: getRandomImageIndex(randomSeed + groupIndex * 100 + i * 10, orientation),
                         zIndex: groupIndex,
                         startFrame: Math.floor(timingData.beat_times[beatIdx + i] * fps),
                         gridIdx: i,
@@ -258,7 +263,7 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
                 items.push({
                     groupIndex,
                     layout: 'coordsImage',
-                    imgIndex: getRandomImageIndex(orientation), // 완전 랜덤 선택
+                    imgIndex: getRandomImageIndex(randomSeed + groupIndex * 100 + i * 10, orientation),
                     zIndex: groupIndex,
                     startFrame: Math.floor(timingData.beat_times[beatIdx + i] * fps),
                     coordsPos: coordsPositions[i],
@@ -291,7 +296,7 @@ export const BeatVideo = ({ title, images = [], music, tripId }: z.infer<typeof 
     return (
         <AbsoluteFill style={{ backgroundColor: 'black' }}>
             {/* 배경 음악이 있다면 재생 */}
-            {music && <Audio src={music} />}
+            <Audio src={staticFile('/music.mp3')} />
 
             {(() => {
                 // 디버깅: 현재 프레임에서 렌더링될 아이템들 필터링
