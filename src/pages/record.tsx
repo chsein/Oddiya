@@ -235,7 +235,7 @@ const Record: NextPage = () => {
                 <div className={styles.container}>
                     <Header
                         backgroundColor="#00EEFF"
-                        leftImage={{ src: '/headerimg/blue Left.png', alt: 'Record' }}
+                        leftImage={{ src: '/headerimg/blueLeft.png', alt: 'Record' }}
                         rightImage={{ src: '/headerimg/blueRight.png', alt: 'Record' }}
                         title="기록 하세요!"
                         leftButton={{

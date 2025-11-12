@@ -242,7 +242,7 @@ const VideoList: NextPage = () => {
                 <div className={styles.container}>
                     <Header
                         backgroundColor="#00EEFF"
-                        leftImage={{ src: '/headerimg/blue Left.png', alt: 'Video List' }}
+                        leftImage={{ src: '/headerimg/blueLeft.png', alt: 'Video List' }}
                         rightImage={{ src: '/headerimg/blueRight.png', alt: 'Video List' }}
                         title="영상 목록"
                         leftButton={{

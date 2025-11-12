@@ -309,7 +309,7 @@ const ScheduleConfirmation: NextPage = () => {
             <div className={styles.container}>
                 <Header
                     backgroundColor="#00EEFF"
-                    leftImage={{ src: '/headerimg/blue Left.png', alt: 'Schedule Confirmation' }}
+                    leftImage={{ src: '/headerimg/blueLeft.png', alt: 'Schedule Confirmation' }}
                     rightImage={{ src: '/headerimg/blueRight.png', alt: 'Schedule Confirmation' }}
                     title="일정을 확인 하세요!"
                     subtitle={itinerary?.destinationCity || ''}

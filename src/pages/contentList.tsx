@@ -31,6 +31,7 @@ const ContentList: NextPage = () => {
     const [selectedFilter, setSelectedFilter] = useState<number | null>(null); // 선택된 필터
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [showEndModal, setShowEndModal] = useState(false);
 
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const gridRef = useRef<HTMLDivElement | null>(null);
@@ -60,6 +61,7 @@ const ContentList: NextPage = () => {
         if (reset) {
             setHasMore(true);
             setDestinations([]);
+            setShowEndModal(false);
         }
 
         try {
@@ -91,7 +93,9 @@ const ContentList: NextPage = () => {
                 return [...prev, ...filtered];
             });
 
+            const shouldShowEndModal = isLastPage && (targetPage > 0 || newItems.length > 0);
             setHasMore(!isLastPage);
+            setShowEndModal(shouldShowEndModal);
             setPage(targetPage);
         } catch (err) {
             console.error('Error fetching destinations:', err);
@@ -170,6 +174,20 @@ const ContentList: NextPage = () => {
             console.log("🔴 observer 해제됨");
         };
     }, [page, hasMore, loading, fetchDestinations]);
+
+
+    useEffect(() => {
+        const grid = gridRef.current;
+        if (!grid) {
+            return;
+        }
+
+        grid.style.overflowX = showEndModal ? 'hidden' : '';
+
+        return () => {
+            grid.style.overflowX = '';
+        };
+    }, [showEndModal]);
 
 
     // 테스트용: 강제로 선택 상태 설정 (나중에 제거)
@@ -363,6 +381,9 @@ const ContentList: NextPage = () => {
                         ) : (
                             <div className={styles.destinationGrid} ref={gridRef}>
                                 {destinations.map((destination) => {
+                                    if (!destination.photoUrl) {
+                                        return null;
+                                    }
                                     // console.log('=== 개별 여행지 정보 ===');
                                     // console.log('ID:', destination.contentId);
                                     // console.log('제목:', destination.title);
@@ -418,13 +439,31 @@ const ContentList: NextPage = () => {
                                         <span>여행지를 불러오는 중...</span>
                                     </div>
                                 )}
-                                <div ref={loadMoreRef} className={styles.loadMoreTrigger} />
+                                <div
+                                    ref={loadMoreRef}
+                                    className={`${styles.loadMoreTrigger} ${!hasMore ? styles.hiddenTrigger : ''}`}
+                                />
                             </div>
                         )}
-                        {!isFetchingMore && !hasMore && destinations.length > 0 && (
-                            <div className={styles.loadMoreStatus}>
-                                <span>모든 여행지를 확인했어요!</span>
-                            </div>
+                        {showEndModal && (
+                            <>
+                                <div
+                                    className={styles.modalOverlay}
+                                    onClick={() => setShowEndModal(false)}
+                                />
+                                <div className={styles.endModal}>
+                                    <h3 className={styles.endModalTitle}>모든 여행지를 확인했어요!</h3>
+                                    <p className={styles.endModalMessage}>
+                                        새로운 여행지가 더 이상 없어요. 다른 지역이나 카테고리를 선택해볼까요?
+                                    </p>
+                                    <button
+                                        className={styles.endModalButton}
+                                        onClick={() => setShowEndModal(false)}
+                                    >
+                                        닫기
+                                    </button>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>
