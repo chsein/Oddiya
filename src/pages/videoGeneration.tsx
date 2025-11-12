@@ -269,7 +269,7 @@ const VideoGeneration: NextPage = () => {
                 <div className={styles.container}>
                     <Header
                         backgroundColor="#00EEFF"
-                        leftImage={{ src: '/headerimg/blue Left.png', alt: 'Video Generation' }}
+                        leftImage={{ src: '/headerimg/blueLeft.png', alt: 'Video Generation' }}
                         rightImage={{ src: '/headerimg/blueRight.png', alt: 'Video Generation' }}
                         title="영상 생성하기"
                         leftButton={{
