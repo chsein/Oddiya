@@ -110,8 +110,8 @@ const ContentMenu: NextPage = () => {
             <div className={styles.container}>
                 <Header
                     backgroundColor="#00FFAA"
-                    leftIcons={['←', '🏠']}
-                    rightIcons={['⚙️', '📱']}
+                    leftImage={{ src: '/headerimg/yellowLeft.png', alt: 'Content Menu' }}
+                    rightImage={{ src: '/headerimg/yellowRight.png', alt: 'Content Menu' }}
                     title={`${tripData.tripName || 'ODDIYA'}`}
                     leftButton={{
                         text: "뒤로가기",

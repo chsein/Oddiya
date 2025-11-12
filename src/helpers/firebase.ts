@@ -20,14 +20,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Analytics 인스턴스 (브라우저에서만 초기화)
+// Analytics 인스턴스 (프로덕션 환경에서만 초기화)
 let analytics: ReturnType<typeof getAnalytics> | null = null;
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
     try {
         analytics = getAnalytics(app);
+        console.log('✅ Firebase Analytics 초기화 완료');
     } catch (error) {
-        console.error('Firebase Analytics 초기화 실패:', error);
+        console.error('❌ Firebase Analytics 초기화 실패:', error);
     }
+} else if (typeof window !== 'undefined') {
+    console.log('ℹ️ Firebase Analytics: 개발 환경에서 비활성화됨 (404 오류 방지)');
 }
 
 // Auth 인스턴스

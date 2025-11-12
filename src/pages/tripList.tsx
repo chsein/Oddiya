@@ -95,8 +95,8 @@ const TripList: NextPage = () => {
                 <div className={styles.container}>
                     <Header
                         backgroundColor="#00FFAA"
-                        leftIcons={['←', '🏠']}
-                        rightIcons={['➕', '⚙️']}
+                        leftImage={{ src: '/headerimg/greenLeft.png', alt: 'Trip List' }}
+                        rightImage={{ src: '/headerimg/greenRight.png', alt: 'Trip List' }}
                         title="여행 기록"
                         leftButton={{
                             text: "로그아웃",

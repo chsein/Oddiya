@@ -2,9 +2,318 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import Header from "../components/Header";
 import styles from "../styles/ContentDetail.module.css";
 import { getContentDetail, ContentDetail as ContentDetailType, deleteBasketItem } from "../helpers/api";
+
+type CategoryKey =
+    | "lodging"
+    | "culture"
+    | "festival"
+    | "food"
+    | "shopping"
+    | "sports"
+    | "tourist";
+
+interface CategoryConfig {
+    label: string;
+    contentTypeIds: number[];
+    friendlyFields: string[];
+    coreFields: string[];
+}
+
+const CATEGORY_CONFIGS: Record<CategoryKey, CategoryConfig> = {
+    lodging: {
+        label: "숙박",
+        contentTypeIds: [32],
+        friendlyFields: ["chkcooking", "bicycle", "barbecue", "campfire", "pickup"],
+        coreFields: ["checkintime", "checkouttime", "reservationurl"],
+    },
+    culture: {
+        label: "문화시설",
+        contentTypeIds: [14],
+        friendlyFields: ["chkbabycarriageculture", "spendtime", "discountinfo"],
+        coreFields: ["usefee", "usetimeculture", "restdateculture"],
+    },
+    festival: {
+        label: "축제",
+        contentTypeIds: [15],
+        friendlyFields: ["subevent", "agelimit", "playtime"],
+        coreFields: ["eventstartdate", "eventenddate", "eventplace"],
+    },
+    food: {
+        label: "음식점",
+        contentTypeIds: [39],
+        friendlyFields: ["kidsfacility", "menu_for_children", "outdoor_seating"],
+        coreFields: ["firstmenu", "opentimefood", "restdatefood"],
+    },
+    shopping: {
+        label: "쇼핑",
+        contentTypeIds: [38],
+        friendlyFields: ["chkbabycarriageshopping", "restroom", "culturecenter"],
+        coreFields: ["opentime", "restdateshopping"],
+    },
+    sports: {
+        label: "스포츠",
+        contentTypeIds: [28],
+        friendlyFields: ["expagerangeleports", "chkbabycarriageleports"],
+        coreFields: ["openperiod", "usetimeleports"],
+    },
+    tourist: {
+        label: "관광지",
+        contentTypeIds: [12],
+        friendlyFields: ["chkbabycarriage", "heritage1", "heritage2", "heritage3"],
+        coreFields: ["opendate", "restdate", "usetime"],
+    },
+};
+
+const FIELD_LABELS: Record<string, string> = {
+    chkcooking: "취사 가능 여부",
+    bicycle: "자전거 대여",
+    barbecue: "바비큐 시설",
+    campfire: "캠프파이어",
+    pickup: "픽업 서비스",
+    checkintime: "체크인 시간",
+    checkouttime: "체크아웃 시간",
+    reservationurl: "예약 링크",
+    chkbabycarriageculture: "유모차 대여 여부",
+    spendtime: "체험 소요 시간",
+    discountinfo: "할인 정보",
+    usefee: "이용 요금",
+    usetimeculture: "이용 시간",
+    restdateculture: "휴무일",
+    subevent: "부대 행사",
+    agelimit: "연령 제한",
+    playtime: "공연 시간",
+    eventstartdate: "행사 시작일",
+    eventenddate: "행사 종료일",
+    eventplace: "행사 장소",
+    kidsfacility: "키즈 시설",
+    menu_for_children: "어린이 메뉴",
+    outdoor_seating: "야외 좌석",
+    firstmenu: "대표 메뉴",
+    opentimefood: "영업 시간",
+    restdatefood: "휴무일",
+    chkbabycarriageshopping: "유모차 대여",
+    restroom: "화장실",
+    culturecenter: "문화센터/문화공간",
+    opentime: "영업 시간",
+    restdateshopping: "휴무일",
+    expagerangeleports: "체험 가능 연령",
+    chkbabycarriageleports: "유모차 대여",
+    openperiod: "운영 기간",
+    usetimeleports: "이용 시간",
+    chkbabycarriage: "유모차 대여",
+    heritage1: "세계문화유산",
+    heritage2: "세계자연유산",
+    heritage3: "세계기록유산",
+    opendate: "개장일",
+    restdate: "휴무일",
+    usetime: "이용 시간",
+};
+
+const URL_FIELD_KEYS = new Set(["reservationurl"]);
+
+const safeParseJSON = (value: string) => {
+    try {
+        return JSON.parse(value);
+    } catch (error) {
+        return null;
+    }
+};
+
+const normalizeDetailData = (data: any): Record<string, unknown> => {
+    const result: Record<string, unknown> = {};
+
+    if (!data) {
+        return result;
+    }
+
+    const handleValue = (key: string, value: unknown) => {
+        if (value === null || value === undefined) return;
+
+        if (typeof value === "string") {
+            const trimmed = value.trim();
+            if (trimmed) {
+                result[key] = trimmed;
+            }
+            return;
+        }
+
+        if (Array.isArray(value)) {
+            const joined = value
+                .map((item) => {
+                    if (typeof item === "string") return item.trim();
+                    if (typeof item === "number") return item.toString();
+                    if (item && typeof item === "object") {
+                        return Object.values(item)
+                            .filter(Boolean)
+                            .join(", ");
+                    }
+                    return "";
+                })
+                .filter(Boolean)
+                .join(", ");
+
+            if (joined) {
+                result[key] = joined;
+            }
+            return;
+        }
+
+        if (typeof value === "object") {
+            const nested = Object.values(value as Record<string, unknown>)
+                .filter(Boolean)
+                .map((item) => {
+                    if (typeof item === "string") return item.trim();
+                    if (typeof item === "number") return item.toString();
+                    if (item && typeof item === "object") {
+                        return Object.values(item)
+                            .filter(Boolean)
+                            .join(", ");
+                    }
+                    return "";
+                })
+                .filter(Boolean)
+                .join(", ");
+
+            if (nested) {
+                result[key] = nested;
+            }
+            return;
+        }
+
+        result[key] = value;
+    };
+
+    if (typeof data === "string") {
+        const parsed = safeParseJSON(data);
+        if (parsed) {
+            return normalizeDetailData(parsed);
+        }
+        return result;
+    }
+
+    if (Array.isArray(data)) {
+        data.forEach((item, index) => {
+            if (typeof item === "string") {
+                const parsed = safeParseJSON(item);
+                if (parsed) {
+                    Object.assign(result, normalizeDetailData(parsed));
+                }
+            } else if (item && typeof item === "object") {
+                Object.entries(item).forEach(([key, value]) => {
+                    if (key && !(key in result)) {
+                        handleValue(key, value);
+                    }
+                });
+            } else if (item !== null && item !== undefined) {
+                result[`item_${index}`] = item;
+            }
+        });
+        return result;
+    }
+
+    if (typeof data === "object") {
+        Object.entries(data).forEach(([key, value]) => {
+            handleValue(key, value);
+        });
+    }
+
+    return result;
+};
+
+const getFieldLabel = (key: string) => FIELD_LABELS[key] ?? key;
+
+const extractFieldValue = (
+    key: string,
+    introData: Record<string, unknown>,
+    infoData: Record<string, unknown>
+): string | null => {
+    const rawValue = introData[key] ?? infoData[key];
+
+    if (rawValue === null || rawValue === undefined) {
+        return null;
+    }
+
+    if (typeof rawValue === "string") {
+        const trimmed = rawValue.trim();
+        return trimmed.length > 0 ? trimmed : null;
+    }
+
+    if (typeof rawValue === "number") {
+        return rawValue.toString();
+    }
+
+    if (Array.isArray(rawValue)) {
+        const joined = rawValue
+            .map((item) => (item && typeof item === "object" ? Object.values(item).join(", ") : String(item)))
+            .filter(Boolean)
+            .join(", ");
+        return joined || null;
+    }
+
+    if (typeof rawValue === "object") {
+        const joined = Object.values(rawValue as Record<string, unknown>)
+            .filter(Boolean)
+            .map((item) => String(item))
+            .join(", ");
+        return joined || null;
+    }
+
+    return String(rawValue);
+};
+
+const DATE_MATCH_REGEX = /(\d{4})[.\-\/]?(0[1-9]|1[0-2])[.\-\/]?(0[1-9]|[12][0-9]|3[01])/;
+const DATE_REPLACE_REGEX = /(\d{4})[.\-\/]?(0[1-9]|1[0-2])[.\-\/]?(0[1-9]|[12][0-9]|3[01])/g;
+
+const shouldFormatAsDate = (key: string, rawValue: string) => {
+    const lowered = key.toLowerCase();
+    return lowered.includes("date") || lowered.includes("day") || DATE_MATCH_REGEX.test(rawValue);
+};
+
+const formatDateString = (value: string) => {
+    if (value.includes("년") && value.includes("월")) {
+        return value;
+    }
+
+    return value.replace(DATE_REPLACE_REGEX, (_, year, month, day) => {
+        return `${year}년 ${month}월 ${day}일`;
+    });
+};
+
+const formatFieldValue = (key: string, value: string) => {
+    if (!value) return null;
+
+    let displayValue = value.replace(/<br\s*\/?>/gi, "\n").replace(/\\n/g, "\n");
+
+    if (shouldFormatAsDate(key, value)) {
+        displayValue = formatDateString(displayValue);
+    }
+
+    if (URL_FIELD_KEYS.has(key)) {
+        const href = value.startsWith("http") ? value : `https://${value}`;
+        return (
+            <a href={href} target="_blank" rel="noopener noreferrer" className={styles.detailFieldLink}>
+                {displayValue}
+            </a>
+        );
+    }
+
+    return <span className={styles.detailFieldValueText}>{displayValue}</span>;
+};
+
+const findCategoryByContentType = (contentTypeId?: string | number | null): CategoryConfig | null => {
+    if (!contentTypeId) return null;
+    const numericId = typeof contentTypeId === "string" ? Number(contentTypeId) : contentTypeId;
+
+    const matchedEntry = Object.values(CATEGORY_CONFIGS).find((config) =>
+        config.contentTypeIds.includes(numericId)
+    );
+
+    return matchedEntry ?? null;
+};
 
 const ContentDetail: NextPage = () => {
     const router = useRouter();
@@ -15,7 +324,7 @@ const ContentDetail: NextPage = () => {
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [showImageModal, setShowImageModal] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [showDetailModal, setShowDetailModal] = useState<{ title: string, content: string } | null>(null);
+    const [showDetailModal, setShowDetailModal] = useState<{ title: string; content: ReactNode } | null>(null);
 
     // tripId, destinationId, regionName을 안전하게 처리
     const safeTripId = Array.isArray(tripId) ? tripId[0] : tripId;
@@ -45,58 +354,6 @@ const ContentDetail: NextPage = () => {
                     const dest = response.data;
                     setDestination(dest);
 
-                    // destination의 모든 필드를 개별적으로 출력
-                    console.log('=== 설정된 destination 상세 정보 ===');
-                    console.log('id:', dest.id);
-                    console.log('contentId:', dest.contentId);
-                    console.log('googlePlaceId:', dest.googlePlaceId);
-                    console.log('contentTypeId:', dest.contentTypeId);
-                    console.log('title:', dest.title);
-                    console.log('overview:', dest.overview);
-                    console.log('addr1:', dest.addr1);
-                    console.log('addr2:', dest.addr2);
-                    console.log('tel:', dest.tel);
-                    console.log('homepage:', dest.homepage);
-                    console.log('areaCode:', dest.areaCode);
-                    console.log('sigunguCode:', dest.sigunguCode);
-                    console.log('latitude:', dest.latitude);
-                    console.log('longitude:', dest.longitude);
-                    console.log('plusCode:', dest.plusCode);
-                    console.log('firstImage:', dest.firstImage);
-                    console.log('rating:', dest.rating);
-                    console.log('reviewCount:', dest.reviewCount);
-                    console.log('googleRating:', dest.googleRating);
-                    console.log('googleRatingCount:', dest.googleRatingCount);
-                    console.log('priceLevel:', dest.priceLevel);
-                    console.log('editorialSummary:', dest.editorialSummary);
-                    console.log('generativeSummary:', dest.generativeSummary);
-                    console.log('goodForChildren:', dest.goodForChildren);
-                    console.log('allowsDogs:', dest.allowsDogs);
-                    console.log('restroom:', dest.restroom);
-                    console.log('wheelchairAccessibleEntrance:', dest.wheelchairAccessibleEntrance);
-                    console.log('wheelchairAccessibleRestroom:', dest.wheelchairAccessibleRestroom);
-                    console.log('wheelchairAccessibleParking:', dest.wheelchairAccessibleParking);
-                    console.log('freeParkingLot:', dest.freeParkingLot);
-                    console.log('paidParkingLot:', dest.paidParkingLot);
-                    console.log('acceptsCreditCards:', dest.acceptsCreditCards);
-                    console.log('acceptsContactlessPayment:', dest.acceptsContactlessPayment);
-                    console.log('businessStatus:', dest.businessStatus);
-                    console.log('dataQuality:', dest.dataQuality);
-                    console.log('lastUpdated:', dest.lastUpdated);
-                    console.log('detailInfoJson:', dest.detailInfoJson);
-                    console.log('detailIntro:', dest.detailIntro);
-                    console.log('fullAddress:', dest.fullAddress);
-                    console.log('contentTypeName:', dest.contentTypeName);
-                    console.log('createdAt:', dest.createdAt);
-                    console.log('updatedAt:', dest.updatedAt);
-                    console.log('photos 배열 길이:', dest.photos?.length || 0);
-                    console.log('photos:', dest.photos);
-                    console.log('reviews 배열 길이:', dest.reviews?.length || 0);
-                    console.log('reviews:', dest.reviews);
-                    console.log('openingHours 배열 길이:', dest.openingHours?.length || 0);
-                    console.log('openingHours:', dest.openingHours);
-                    console.log('=== destination 전체 객체 ===');
-                    console.log(dest);
                 } else {
                     setError('데이터를 불러오는데 실패했습니다.');
                 }
@@ -163,6 +420,82 @@ const ContentDetail: NextPage = () => {
             console.error('❌ 장바구니 항목 삭제 실패:', error);
             alert('장바구니에서 항목을 삭제하는데 실패했습니다.');
         }
+    };
+
+    const renderDetailContent = () => {
+        if (!destination) {
+            return <div className={styles.detailEmpty}>추가 상세 정보가 없습니다.</div>;
+        }
+
+        const categoryConfig = findCategoryByContentType(destination.contentTypeId);
+        const introData = normalizeDetailData(destination.detailIntro);
+        const infoData = normalizeDetailData(destination.detailInfoJson);
+
+        const buildFieldItems = (fields: string[]) =>
+            fields
+                .map((fieldKey) => {
+                    const value = extractFieldValue(fieldKey, introData, infoData);
+                    if (!value) return null;
+
+                    return (
+                        <div key={fieldKey} className={styles.detailField}>
+                            <div className={styles.detailFieldLabel}>{getFieldLabel(fieldKey)}</div>
+                            <div className={styles.detailFieldValue}>{formatFieldValue(fieldKey, value)}</div>
+                        </div>
+                    );
+                })
+                .filter(Boolean);
+
+        const combinedFieldItems = categoryConfig
+            ? buildFieldItems(Array.from(new Set([...categoryConfig.coreFields, ...categoryConfig.friendlyFields])))
+            : [];
+
+        const introSummary =
+            typeof destination.detailIntro === "string" && destination.detailIntro.trim().length > 0
+                ? destination.detailIntro.trim()
+                : null;
+
+        const fallbackItems = !categoryConfig
+            ? Object.entries(introData)
+                .concat(Object.entries(infoData))
+                .reduce<Record<string, string>>((acc, [key, value]) => {
+                    if (acc[key]) return acc;
+                    const valueString = typeof value === "string" ? value : String(value ?? "");
+                    if (valueString.trim()) {
+                        acc[key] = valueString.trim();
+                    }
+                    return acc;
+                }, {})
+            : {};
+
+        return (
+            <div className={styles.detailModalContainer}>
+                {introSummary && (
+                    <div className={styles.detailIntroSummary}>
+                        <p className={styles.detailIntroText}>{introSummary}</p>
+                    </div>
+                )}
+
+                <div className={styles.detailFields}>
+                    {categoryConfig && combinedFieldItems.length > 0 && combinedFieldItems}
+                    {!categoryConfig && Object.keys(fallbackItems).length > 0 && (
+                        Object.entries(fallbackItems).map(([key, value]) => (
+                            <div key={key} className={styles.detailField}>
+                                <div className={styles.detailFieldLabel}>{getFieldLabel(key)}</div>
+                                <div className={styles.detailFieldValue}>
+                                    {formatFieldValue(key, value)}
+                                </div>
+                            </div>
+                        ))
+                    )}
+
+                    {((categoryConfig && combinedFieldItems.length === 0) ||
+                        (!categoryConfig && Object.keys(fallbackItems).length === 0)) && (
+                            <div className={styles.detailEmpty}>추가 상세 정보가 없습니다.</div>
+                        )}
+                </div>
+            </div>
+        );
     };
 
     const handleSelect = () => {
@@ -274,21 +607,25 @@ const ContentDetail: NextPage = () => {
             <div className={styles.container}>
                 <Header
                     backgroundColor="#FFE135"
-                    leftIcons={['🛟', '🧴']}
-                    rightIcons={['🏮', '🏄', '🏐']}
+                    leftImage={{ src: '/headerimg/yellowLeft.png', alt: 'Content Detail' }}
+                    rightImage={{ src: '/headerimg/yellowRight.png', alt: 'Content Detail' }}
                     title={destination.title}
                     subtitle={destination.addr1}
                     leftButton={{
                         text: "돌아가기",
                         onClick: handleBack
                     }}
-                    rightButton={isFromCollection ? {
-                        text: "삭제",
-                        onClick: handleDelete
-                    } : {
-                        text: "선택하기",
-                        onClick: handleSelect
-                    }}
+                    rightButton={isFromCollection
+                        ? {
+                            text: "삭제",
+                            onClick: handleDelete
+                        }
+                        : (isFromSchedule
+                            ? undefined
+                            : {
+                                text: "선택하기",
+                                onClick: handleSelect
+                            })}
                 />
 
                 <div className={styles.content}>
@@ -370,44 +707,57 @@ const ContentDetail: NextPage = () => {
                                             </div>
                                         )}
 
-                                        {/* 전화번호 카드 - tel이 있을 때만 표시 */}
-                                        {destination.tel && destination.tel.trim() !== '' && (() => {
-                                            const phoneNumbers = destination.tel.split(/[,\n]/).map(phone => phone.trim()).filter(phone => phone !== '');
-                                            return (
-                                                <div className={styles.featureCard}>
-                                                    <div className={styles.featureText}>
-                                                        📞 {phoneNumbers.map((phone, index) => (
-                                                            <React.Fragment key={index}>
-                                                                {phone}
-                                                                {index < phoneNumbers.length - 1 && <br />}
-                                                            </React.Fragment>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })()}
+                                        {/* 연락처 / 홈페이지 카드 */}
+                                        {((destination.tel && destination.tel.trim() !== '') || (destination.homepage && destination.homepage.trim() !== '')) && (
+                                            <div className={`${styles.featureCard} ${styles.contactCard}`}>
+                                                {destination.tel && destination.tel.trim() !== '' && (() => {
+                                                    const phoneNumbers = destination.tel.split(/[,\n]/).map(phone => phone.trim()).filter(phone => phone !== '');
+                                                    return (
+                                                        <div className={styles.featureText}>
+                                                            📞 {phoneNumbers.map((phone, index) => (
+                                                                <React.Fragment key={index}>
+                                                                    {phone}
+                                                                    {index < phoneNumbers.length - 1 && <br />}
+                                                                </React.Fragment>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                })()}
 
-                                        {/* 개요 카드 - overview가 있을 때만 표시 */}
-                                        {destination.overview && destination.overview.trim() !== '' && (() => {
-                                            const isLongText = destination.overview.length > 100;
-                                            return (
+                                                {destination.homepage && destination.homepage.trim() !== '' && (
+                                                    <div className={styles.featureText}>
+                                                        🌐 <a
+                                                            href={destination.homepage.startsWith('http') ? destination.homepage : `https://${destination.homepage}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className={styles.link}
+                                                        >
+                                                            홈페이지 바로가기
+                                                        </a>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+
+
+
+                                        {/* 상세 정보 모달 카드 */}
+                                        {((destination.detailIntro && String(destination.detailIntro).trim() !== '') ||
+                                            (destination.detailInfoJson && String(destination.detailInfoJson).trim() !== '')) && (
                                                 <div
-                                                    className={styles.featureCard}
-                                                    onClick={isLongText ? () => setShowDetailModal({
+                                                    className={`${styles.featureCard} ${styles.moreInfoCard}`}
+                                                    onClick={() => setShowDetailModal({
                                                         title: '상세 정보',
-                                                        content: destination.overview
-                                                    }) : undefined}
-                                                    style={{ cursor: isLongText ? 'pointer' : 'default' }}
+                                                        content: renderDetailContent()
+                                                    })}
+                                                    style={{ cursor: 'pointer' }}
                                                 >
                                                     <div className={styles.featureText}>
-                                                        📝 {isLongText
-                                                            ? `${destination.overview.substring(0, 100)}...`
-                                                            : destination.overview}
+                                                        ℹ️ 상세 정보 더보기
                                                     </div>
-                                                    {isLongText && <div className={styles.moreText}>더보기</div>}
                                                 </div>
-                                            );
-                                        })()}
+                                            )}
 
                                         {/* 편의시설 카드들 - true인 것만 표시 */}
                                         {activeFacilities.map((facility, index) => (

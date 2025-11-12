@@ -66,11 +66,10 @@ body {
     font-weight: bold;
     text-align: center;
     z-index: 9999;
-    padding: 2rem;
     font-family: var(--geist-font);
   }
-  
-  body > *:not(script) {
+
+  body>*:not(script) {
     display: none !important;
   }
 }

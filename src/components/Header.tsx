@@ -1,10 +1,17 @@
 import React from 'react';
 import styles from '../styles/Header.module.css';
 
+interface SideImage {
+    src: string;
+    alt?: string;
+}
+
 interface HeaderProps {
     backgroundColor?: string;
     leftIcons?: string[];
     rightIcons?: string[];
+    leftImage?: SideImage;
+    rightImage?: SideImage;
     title: string;
     subtitle?: string;
     showTripListButton?: boolean;
@@ -26,6 +33,8 @@ const Header: React.FC<HeaderProps> = ({
     backgroundColor = '#00FFAA',
     leftIcons = ['🎨', '⚡'],
     rightIcons = ['📱', '✨'],
+    leftImage,
+    rightImage,
     title = 'ODDIYA',
     subtitle,
     showTripListButton = false,
@@ -40,11 +49,21 @@ const Header: React.FC<HeaderProps> = ({
             <div className={styles.headerContent}>
                 {/* 왼쪽 아이콘들 */}
                 <div className={styles.leftIcons}>
-                    {leftIcons.map((icon, index) => (
-                        <div key={index} className={styles.iconContainer}>
-                            <span className={styles.icon}>{icon}</span>
+                    {leftImage ? (
+                        <div className={styles.imageContainer}>
+                            <img
+                                src={leftImage.src}
+                                alt={leftImage.alt ?? 'Left decoration'}
+                                className={styles.sideImage}
+                            />
                         </div>
-                    ))}
+                    ) : (
+                        leftIcons.map((icon, index) => (
+                            <div key={index} className={styles.iconContainer}>
+                                <span className={styles.icon}>{icon}</span>
+                            </div>
+                        ))
+                    )}
                 </div>
 
                 {/* 왼쪽 버튼 */}
@@ -80,11 +99,21 @@ const Header: React.FC<HeaderProps> = ({
 
                 {/* 오른쪽 아이콘들 */}
                 <div className={styles.rightIcons}>
-                    {rightIcons.map((icon, index) => (
-                        <div key={index} className={styles.iconContainer}>
-                            <span className={styles.icon}>{icon}</span>
+                    {rightImage ? (
+                        <div className={styles.imageContainer}>
+                            <img
+                                src={rightImage.src}
+                                alt={rightImage.alt ?? 'Right decoration'}
+                                className={styles.sideImage}
+                            />
                         </div>
-                    ))}
+                    ) : (
+                        rightIcons.map((icon, index) => (
+                            <div key={index} className={styles.iconContainer}>
+                                <span className={styles.icon}>{icon}</span>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
 

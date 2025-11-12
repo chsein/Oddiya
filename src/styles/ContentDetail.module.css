@@ -142,10 +142,80 @@
     line-height: 1.6;
     color: #333;
     white-space: pre-line;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 10px;
-    border: 1px solid #e9ecef;
+}
+
+.detailModalContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    color: #333;
+    white-space: normal;
+}
+
+.detailIntroSummary {
+    background: linear-gradient(135deg, rgba(255, 225, 53, 0.2), rgba(255, 215, 0, 0.4));
+    border: 1px solid rgba(255, 199, 0, 0.4);
+    border-radius: 14px;
+    padding: 16px 18px;
+}
+
+.detailIntroText {
+    margin: 8px 0 0;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.detailFields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.detailField {
+    background: transparent;
+    border: 2px solid #FFD700;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detailFieldLabel {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #594000;
+}
+
+.detailFieldValue {
+    font-size: 0.95rem;
+    color: #333;
+    white-space: pre-line;
+    word-break: break-word;
+}
+
+.detailFieldValueText {
+    white-space: pre-line;
+}
+
+.detailFieldLink {
+    color: #0c4abf;
+    font-weight: 600;
+    text-decoration: underline;
+    word-break: break-all;
+}
+
+.detailFieldLink:hover {
+    color: #062c6d;
+}
+
+.detailEmpty {
+    font-size: 0.95rem;
+    color: #666;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
 }
 
 .photosSection {
@@ -343,6 +413,11 @@
     overflow: hidden;
 }
 
+.contactCard {
+    align-items: center;
+    gap: 8px;
+}
+
 .featureIcon {
     font-size: 2.5rem;
     flex-shrink: 0;
@@ -350,7 +425,7 @@
 }
 
 .featureText {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     color: #333;
     font-weight: 500;
     white-space: pre-line;
@@ -363,6 +438,29 @@
     line-clamp: 2;
     -webkit-box-orient: vertical;
     max-height: 2.4em;
+}
+
+.link {
+    color: #1a73e8;
+    font-weight: 600;
+    text-decoration: underline;
+    word-break: break-all;
+    font-size: 1.1rem;
+}
+
+.link:hover {
+    color: #0c4abf;
+}
+
+.moreInfoCard {
+    background: linear-gradient(135deg, #FFE135, #FFD700);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.moreInfoCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    border-color: #FFE135;
 }
 
 /* 아이콘 카드 (정사각형) */
@@ -512,7 +610,7 @@
     }
 
     .featureText {
-        font-size: 0.65rem;
+        font-size: 1rem;
         line-height: 1.2;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -872,7 +970,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 25px;
+    padding: 10px 15px;
     background: linear-gradient(135deg, #FFE135, #FFD700);
     border-bottom: 3px solid #333;
 }
@@ -1045,8 +1143,8 @@
     background: white;
     border-radius: 20px;
     width: 100%;
-    max-width: 70vw;
-    max-height: 80vh;
+    max-width: 85vw;
+    max-height: 90vh;
     overflow: hidden;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     animation: modalSlideIn 0.3s ease-out;
@@ -1062,8 +1160,8 @@
 }
 
 .imageModalBody {
-    padding: 8px 5px;
-    max-height: calc(80vh - 80px);
+    padding: 12px 10px;
+    max-height: calc(90vh - 90px);
     overflow: hidden;
 }
 

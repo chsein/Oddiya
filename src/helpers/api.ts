@@ -200,7 +200,7 @@ const apiClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true', // ngrok 브라우저 경고 스킵
-        'User-Agent': 'ODDIYA-Frontend/1.0', // 사용자 에이전트 설정
+        // User-Agent는 브라우저가 자동으로 설정하는 헤더이므로 제거 (설정 시 경고 발생)
     },
 });
 
@@ -272,17 +272,32 @@ apiClient.interceptors.response.use(
     }
 );
 
-// 지역별 컨텐츠 조회 API (contentTypeId 옵션 추가)
-export const getContentsByRegion = async (regionName: string, contentTypeId?: number): Promise<ContentsResponse> => {
+// 지역별 컨텐츠 조회 API (contentTypeId, page 옵션 추가)
+export const getContentsByRegion = async (
+    regionName: string,
+    contentTypeId?: number,
+    page: number = 0,
+    size?: number
+): Promise<ContentsResponse> => {
     try {
-        const url = contentTypeId
-            ? `/api/v1/contents/regions/${regionName}?contentTypeId=${contentTypeId}`
-            : `/api/v1/contents/regions/${regionName}`;
+        const params: Record<string, any> = {
+            page,
+        };
 
-        console.log('🌍 API 호출 - Region:', regionName, 'ContentType:', contentTypeId || 'All');
+        if (typeof contentTypeId === 'number') {
+            params.contentTypeId = contentTypeId;
+        }
+
+        if (typeof size === 'number') {
+            params.size = size;
+        }
+
+        console.log('🌍 API 호출 - Region:', regionName, 'ContentType:', contentTypeId || 'All', 'Page:', page);
 
         // apiClient를 사용하여 Authorization 헤더 자동 포함
-        const response = await apiClient.get(url);
+        const response = await apiClient.get(`/api/v1/contents/regions/${regionName}`, {
+            params,
+        });
 
         return response.data;
     } catch (error) {
@@ -679,6 +694,137 @@ export const deletePhoto = async (
         console.log('📸 사진 삭제 성공:', photoId);
     } catch (error) {
         console.error('Error deleting photo:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// ========== Video API ==========
+
+// Video 관련 타입 정의
+export interface RenderVideoRequest {
+    composition: string;  // 'BeatVideo', 'SlideVideo', etc.
+    inputProps: {
+        title?: string;
+        images: Array<{
+            url: string;
+            orientation: 'landscape' | 'portrait';
+            aspectRatio: number;
+        }>;
+        music?: string;
+        tripId?: string;
+        [key: string]: any;
+    };
+}
+
+export interface VideoMetadata {
+    width?: number;
+    height?: number;
+    durationSeconds?: number;
+    fps?: number;
+    codec?: string;
+}
+
+export interface VideoStatusResponse {
+    videoId: string;
+    status: 'PENDING' | 'RENDERING' | 'PROCESSED' | 'FAILED';
+    progress: number;  // 0-100
+    url?: string;  // Pre-signed download URL (PROCESSED 상태일 때만)
+    errorMessage?: string;
+    metadata?: VideoMetadata;
+    createdAt?: string;
+}
+
+export interface Video {
+    videoId: string;  // 백엔드 API 응답과 일치하도록 수정
+    tripId: string;
+    uploaderId: string;
+    s3Key?: string;  // Optional로 변경 (PENDING 상태에서는 없을 수 있음)
+    s3Bucket?: string;  // Optional로 변경
+    status: 'PENDING' | 'RENDERING' | 'PROCESSED' | 'FAILED';
+    url?: string;  // Pre-signed download URL (PROCESSED 상태일 때만)
+    metadata?: VideoMetadata;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface VideoListResponse {
+    content: Video[];
+    pageable: any;
+    totalElements: number;
+    totalPages: number;
+    last: boolean;
+    first: boolean;
+}
+
+// 1. 비디오 렌더링 요청
+export const renderVideo = async (
+    tripId: string,
+    request: RenderVideoRequest
+): Promise<VideoStatusResponse> => {
+    try {
+        const response = await apiClient.post(`/api/v1/trips/${tripId}/videos/render`, request);
+        console.log('🎬 비디오 렌더링 요청 성공:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error requesting video render:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// 2. 비디오 상태 조회 (폴링용)
+export const getVideoStatus = async (
+    tripId: string,
+    videoId: string
+): Promise<VideoStatusResponse> => {
+    try {
+        const response = await apiClient.get(`/api/v1/trips/${tripId}/videos/${videoId}/status`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching video status:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// 3. 비디오 목록 조회
+export const getVideos = async (
+    tripId: string,
+    page: number = 0,
+    size: number = 20
+): Promise<VideoListResponse> => {
+    try {
+        const response = await apiClient.get(`/api/v1/trips/${tripId}/videos`, {
+            params: { page, size }
+        });
+        console.log('🎬 비디오 목록 조회 성공:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching videos:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// 4. 비디오 삭제
+export const deleteVideo = async (
+    tripId: string,
+    videoId: string
+): Promise<void> => {
+    try {
+        await apiClient.delete(`/api/v1/trips/${tripId}/videos/${videoId}`);
+        console.log('🎬 비디오 삭제 성공:', videoId);
+    } catch (error) {
+        console.error('Error deleting video:', error);
         if (axios.isAxiosError(error)) {
             throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
         }

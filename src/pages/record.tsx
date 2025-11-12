@@ -8,11 +8,13 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 import {
     Photo,
+    Video,
     requestPhotoUploadUrl,
     uploadPhotoToS3,
     confirmPhotoUpload,
     getPhotos,
     deletePhoto,
+    getVideos,
 } from '../helpers/api';
 
 const Record: NextPage = () => {
@@ -20,11 +22,15 @@ const Record: NextPage = () => {
     const { tripId } = router.query;
     const { user, loading: authLoading } = useAuth();
     const [photos, setPhotos] = useState<Photo[]>([]);
+    const [videos, setVideos] = useState<Video[]>([]);
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // 영상 존재 여부 계산
+    const hasVideos = videos.length > 0;
 
     // tripId를 안전하게 처리
     const safeTripId = Array.isArray(tripId) ? tripId[0] : tripId;
@@ -48,10 +54,26 @@ const Record: NextPage = () => {
         }
     };
 
-    // 페이지 로드 시 사진 목록 조회
+    // 영상 목록 조회
+    const refreshVideos = async () => {
+        if (!safeTripId) return;
+
+        try {
+            const response = await getVideos(safeTripId);
+            setVideos(response.content);
+            console.log('=== 영상 목록 로드 완료 ===');
+            console.log(`총 ${response.content.length}개`);
+        } catch (err) {
+            console.error('영상 목록 조회 실패:', err);
+            // 영상 목록 조회 실패는 치명적이지 않으므로 에러 메시지 표시 안함
+        }
+    };
+
+    // 페이지 로드 시 사진 및 영상 목록 조회
     useEffect(() => {
         if (!authLoading && user && safeTripId) {
             refreshPhotos();
+            refreshVideos();
         }
     }, [authLoading, user, safeTripId]);
 
@@ -65,6 +87,11 @@ const Record: NextPage = () => {
     // 영상 생성하기
     const handleCreateVideo = () => {
         router.push(`/videoGeneration?tripId=${safeTripId}`);
+    };
+
+    // 영상 목록 보기
+    const handleViewVideoList = () => {
+        router.push(`/videoList?tripId=${safeTripId}`);
     };
 
     // 파일 선택 처리
@@ -208,16 +235,16 @@ const Record: NextPage = () => {
                 <div className={styles.container}>
                     <Header
                         backgroundColor="#00EEFF"
-                        leftIcons={['⛰️']}
-                        rightIcons={['☁️', '⚓']}
+                        leftImage={{ src: '/headerimg/blue Left.png', alt: 'Record' }}
+                        rightImage={{ src: '/headerimg/blueRight.png', alt: 'Record' }}
                         title="기록 하세요!"
                         leftButton={{
                             text: "돌아가기",
                             onClick: handleBack
                         }}
                         rightButton={{
-                            text: "영상 생성하기",
-                            onClick: handleCreateVideo
+                            text: hasVideos ? "영상 목록 보기" : "영상 생성하기",
+                            onClick: hasVideos ? handleViewVideoList : handleCreateVideo
                         }}
                     />
 
@@ -272,7 +299,7 @@ const Record: NextPage = () => {
                                         onClick={() => handlePhotoClick(photo)}
                                     >
                                         <img
-                                            src={`/api/image-proxy?url=${encodeURIComponent(photo.thumbnailUrl || photo.url)}`}
+                                            src={photo.thumbnailUrl || photo.url}
                                             alt={photo.fileName}
                                             className={styles.photoImage}
                                         />
@@ -296,7 +323,7 @@ const Record: NextPage = () => {
                             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                                 <div className={styles.modalImageContainer}>
                                     <img
-                                        src={`/api/image-proxy?url=${encodeURIComponent(selectedPhoto.url)}`}
+                                        src={selectedPhoto.url}
                                         alt={selectedPhoto.fileName}
                                         className={styles.modalImage}
                                     />
