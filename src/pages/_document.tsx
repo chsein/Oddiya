@@ -9,14 +9,14 @@ export default function Document() {
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
                 <meta name="apple-mobile-web-app-title" content="ODDIYA" />
-                <meta name="description" content="나만의 여행을 기록하고 공유하는 앱" />
+                <meta name="description" content="아이와의 여행을 기록하고 공유하는 앱" />
                 <meta name="format-detection" content="telephone=no" />
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="msapplication-config" content="/icons/browserconfig.xml" />
                 <meta name="msapplication-TileColor" content="#00FFAA" />
                 <meta name="msapplication-tap-highlight" content="no" />
                 <meta name="theme-color" content="#00FFAA" />
-                
+
                 {/* Force Landscape Orientation */}
                 <meta name="screen-orientation" content="landscape" />
                 <meta name="x5-orientation" content="landscape" />
@@ -24,12 +24,12 @@ export default function Document() {
                 <meta name="full-screen" content="yes" />
 
                 {/* PWA Icons */}
-                <link rel="apple-touch-icon" href="/icons/icon-152x152.png" />
-                <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png" />
-                <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png" />
+                <link rel="apple-touch-icon" href="/defaulticon.png" />
+                <link rel="icon" type="image/png" sizes="32x32" href="/defaulticon.png" />
+                <link rel="icon" type="image/png" sizes="16x16" href="/defaulticon.png" />
                 <link rel="manifest" href="/manifest.json" />
                 <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#00FFAA" />
-                <link rel="shortcut icon" href="/favicon.ico" />
+                <link rel="shortcut icon" href="/defaulticon.png" />
 
                 {/* Fonts */}
                 <link rel="preconnect" href="https://fonts.googleapis.com" />

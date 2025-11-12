@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import Header from "../components/Header";
 import styles from "../styles/ContentDetail.module.css";
-import { getContentDetail, ContentDetail as ContentDetailType, deleteBasketItem } from "../helpers/api";
+import { getContentDetail, ContentDetail as ContentDetailType, deleteBasketItem, addBasketItem, BasketItemRequest } from "../helpers/api";
 
 type CategoryKey =
     | "lodging"
@@ -325,6 +325,7 @@ const ContentDetail: NextPage = () => {
     const [showImageModal, setShowImageModal] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [showDetailModal, setShowDetailModal] = useState<{ title: string; content: ReactNode } | null>(null);
+    const [isSelecting, setIsSelecting] = useState(false);
 
     // tripId, destinationId, regionName을 안전하게 처리
     const safeTripId = Array.isArray(tripId) ? tripId[0] : tripId;
@@ -498,55 +499,32 @@ const ContentDetail: NextPage = () => {
         );
     };
 
-    const handleSelect = () => {
-        if (destination && safeTripId) {
-            console.log('=== SELECT BUTTON CLICKED ===');
-            console.log('Destination:', destination);
-            console.log('TripId:', safeTripId);
+    const handleSelect = async () => {
+        if (!destination || !safeTripId || isSelecting) {
+            console.log('Missing destination or tripId:', { destination, safeTripId, isSelecting });
+            return;
+        }
 
-            // 선택된 여행지를 localStorage에 저장
-            let selectedDestinations = JSON.parse(localStorage.getItem('selectedDestinations') || '{}');
-            const tripKey = `trip_${safeTripId}`;
+        const placeId = destination.id || destination.contentId;
 
-            console.log('Current localStorage:', selectedDestinations);
-            console.log('TripKey:', tripKey);
+        if (!placeId) {
+            alert('선택할 수 있는 여행지 정보가 부족합니다.');
+            return;
+        }
 
-            // selectedDestinations가 배열인 경우 객체로 변환
-            if (Array.isArray(selectedDestinations)) {
-                selectedDestinations = {};
-                console.log('Converted array to object');
-            }
-
-            if (!selectedDestinations[tripKey]) {
-                selectedDestinations[tripKey] = [];
-                console.log('Created new trip array');
-            }
-
-            // 이미 선택된 여행지인지 확인 (contentId로 비교)
-            const isAlreadySelected = selectedDestinations[tripKey].some((dest: any) => dest.contentId === destination.contentId);
-            console.log('Is already selected:', isAlreadySelected);
-
-            if (!isAlreadySelected) {
-                selectedDestinations[tripKey].push(destination);
-                try {
-                    localStorage.setItem('selectedDestinations', JSON.stringify(selectedDestinations));
-                    console.log('Destination saved to localStorage:', selectedDestinations);
-                    console.log('Saved destinations for this trip:', selectedDestinations[tripKey]);
-
-                    // 저장 확인
-                    const savedData = localStorage.getItem('selectedDestinations');
-                    console.log('Verification - saved data:', savedData);
-                    const parsedSavedData = JSON.parse(savedData || '{}');
-                    console.log('Verification - parsed saved data:', parsedSavedData);
-                } catch (error) {
-                    console.error('localStorage save error:', error);
-                }
-            }
-
-            console.log('=== NAVIGATING TO CONTENT LIST ===');
+        try {
+            setIsSelecting(true);
+            const request: BasketItemRequest = {
+                placeId,
+            };
+            await addBasketItem(safeTripId, request);
             router.back();
-        } else {
-            console.log('Missing destination or tripId:', { destination, safeTripId });
+        } catch (error: any) {
+            console.error('❌ 여행지 선택 실패:', error);
+            const apiMessage = error?.response?.data?.message;
+            alert(apiMessage || '여행지를 선택하는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        } finally {
+            setIsSelecting(false);
         }
     };
 
@@ -602,7 +580,7 @@ const ContentDetail: NextPage = () => {
                     name="viewport"
                     content="width=device-width, initial-scale=1, maximum-scale=1"
                 />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/defaulticon.png" />
             </Head>
             <div className={styles.container}>
                 <Header
@@ -623,8 +601,9 @@ const ContentDetail: NextPage = () => {
                         : (isFromSchedule
                             ? undefined
                             : {
-                                text: "선택하기",
-                                onClick: handleSelect
+                                text: isSelecting ? "선택 중..." : "선택하기",
+                                onClick: handleSelect,
+                                disabled: isSelecting
                             })}
                 />
 

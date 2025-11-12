@@ -230,7 +230,7 @@ const Record: NextPage = () => {
                     <title>기록 하세요! - ODDIYA</title>
                     <meta name="description" content="여행의 소중한 순간들을 기록하세요" />
                     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-                    <link rel="icon" href="/favicon.ico" />
+                    <link rel="icon" href="/defaulticon.png" />
                 </Head>
                 <div className={styles.container}>
                     <Header

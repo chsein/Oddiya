@@ -316,7 +316,7 @@ const ContentList: NextPage = () => {
 
     const getDisplayTitle = (title: string = ''): string => {
         if (!title) return '';
-        return title.length > 18 ? `${title.slice(0, 18)}...` : title;
+        return title.length > 15 ? `${title.slice(0, 15)}...` : title;
     };
 
     return (
@@ -329,7 +329,7 @@ const ContentList: NextPage = () => {
                         name="viewport"
                         content="width=device-width, initial-scale=1, maximum-scale=1"
                     />
-                    <link rel="icon" href="/favicon.ico" />
+                    <link rel="icon" href="/defaulticon.png" />
                 </Head>
                 <div className={styles.container}>
                     <Header

@@ -126,7 +126,7 @@ const ContentMenu: NextPage = () => {
                     name="viewport"
                     content="width=device-width, initial-scale=1, maximum-scale=1"
                 />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/defaulticon.png" />
             </Head>
             <div className={styles.container}>
                 <Header
@@ -160,7 +160,7 @@ const ContentMenu: NextPage = () => {
                                     />
                                 </div>
                                 <div className={styles.menuContent}>
-                                    <h3 className={styles.menuTitle}>{item.title}</h3>
+                                    <div className={styles.menuTitle}>{item.title}</div>
                                 </div>
                             </div>
                         ))}

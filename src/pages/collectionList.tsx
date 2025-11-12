@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { NextPage } from 'next';
-import styles from '../styles/ContentList.module.css';
+import styles from '../styles/CollectionList.module.css';
 import Header from '../components/Header';
 import { Spinner } from '../components/Spinner/Spinner';
 import { ErrorComp } from '../components/Error';
@@ -83,6 +83,11 @@ const CollectionList: NextPage = () => {
         router.push(`/contentMenu?tripId=${safeTripId}`);
     };
 
+    const getDisplayTitle = (title: string = ''): string => {
+        if (!title) return '';
+        return title.length > 15 ? `${title.slice(0, 15)}...` : title;
+    };
+
     if (loading) {
         return (
             <div className={styles.container}>
@@ -116,7 +121,7 @@ const CollectionList: NextPage = () => {
                 <title>내 여행지 컬렉션 - ODDIYA</title>
                 <meta name="description" content="선택한 여행지들을 확인하고 관리하세요" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/defaulticon.png" />
             </Head>
             <div className={styles.container}>
                 <Header
@@ -152,6 +157,12 @@ const CollectionList: NextPage = () => {
                                 .filter(item => item.place) // place 정보가 있는 항목만
                                 .map((item) => {
                                     const place = item.place!;
+                                    const imageUrl = place.photoUrl || place.firstImage;
+
+                                    if (!imageUrl) {
+                                        return null;
+                                    }
+
                                     return (
                                         <div
                                             key={item.id}
@@ -160,7 +171,7 @@ const CollectionList: NextPage = () => {
                                         >
                                             <div className={styles.cardImage}>
                                                 <img
-                                                    src={place.firstImage}
+                                                    src={imageUrl}
                                                     alt={place.title}
                                                     className={styles.destinationImage}
                                                     onError={(e) => {
@@ -173,21 +184,15 @@ const CollectionList: NextPage = () => {
 
                                             </div>
                                             <div className={styles.cardContent}>
-                                                <h3 className={styles.cardTitle}>{place.title}</h3>
+                                                <div className={styles.cardTitle} title={place.title}>
+                                                    {getDisplayTitle(place.title)}
+                                                </div>
                                                 <div className={styles.ratingContainer}>
                                                     <span className={styles.rating}>
-                                                        ⭐ {place.rating?.toFixed(1) || '0.0'}
+                                                        ⭐ {(place.rating || 0).toFixed(1)}
                                                     </span>
-                                                    <span className={styles.reviewCount}>
-                                                        ({place.ratingCount || 0}개 리뷰)
-                                                    </span>
-                                                </div>
-                                                {place.address && (
-                                                    <div className={styles.cardCategory}>
-                                                        📍 {place.address}
-                                                    </div>
-                                                )}
 
+                                                </div>
                                             </div>
                                         </div>
                                     );

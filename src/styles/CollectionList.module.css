@@ -1,0 +1,195 @@
+.container {
+    min-height: 100vh;
+    background: #FFF9C4;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.content {
+    padding: 20px;
+    min-height: calc(100vh - 70px);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.loadingContainer,
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    gap: 16px;
+}
+
+.retryButton {
+    background: #FFE135;
+    color: #333;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 225, 53, 0.3);
+}
+
+.retryButton:hover {
+    background: #ffd700;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 225, 53, 0.4);
+}
+
+.emptyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: calc(100vh - 150px);
+    padding: 40px 20px;
+    gap: 16px;
+}
+
+.emptyIcon {
+    font-size: 4rem;
+    opacity: 0.6;
+}
+
+.emptyTitle {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.emptyDescription {
+    font-size: 1rem;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+    max-width: 360px;
+}
+
+.exploreButton {
+    background: #FF6B35;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3);
+}
+
+.exploreButton:hover {
+    background: #ff5520;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(255, 107, 53, 0.35);
+}
+
+.destinationGrid {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #ffd700 #f0f0f0;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+.destinationGrid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.destinationGrid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.destinationGrid::-webkit-scrollbar-thumb {
+    background: #ffd700;
+    border-radius: 4px;
+}
+
+.destinationGrid::-webkit-scrollbar-thumb:hover {
+    background: #ffd700;
+}
+
+.destinationCard {
+    background: white;
+    border-radius: 20px;
+    border: 2px solid #333;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    height: 280px;
+    flex-shrink: 0;
+}
+
+.destinationCard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    border-color: #FFE135;
+}
+
+.cardImage {
+    width: 100%;
+    aspect-ratio: 1 / 0.95;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.destinationImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.cardContent {
+    padding: 10px 12px;
+    background: white;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+}
+
+.cardTitle {
+    font-size: 1.0rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.ratingContainer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rating {
+    font-size: 0.9rem;
+    color: #FF6B35;
+    font-weight: 600;
+}
+
+.reviewCount {
+    font-size: 0.8rem;
+    color: #666;
+}

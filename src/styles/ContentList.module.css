@@ -70,7 +70,7 @@
     overflow-y: hidden;
     padding: 10px;
     scrollbar-width: thin;
-    scrollbar-color: #00FFAA #f0f0f0;
+    scrollbar-color: #FFD700 #f0f0f0;
     width: 100%;
     flex: 1;
     -webkit-overflow-scrolling: touch;
@@ -97,7 +97,6 @@
 .destinationCard {
     background: white;
     border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     border: 2px solid #333;
     overflow: hidden;
     transition: all 0.3s ease;
@@ -112,7 +111,6 @@
 
 .destinationCard:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     border-color: #FFE135;
 }
 
@@ -600,8 +598,18 @@
     }
 
     .destinationCard {
-        width: 250px;
-        height: 300px;
+        background: white;
+        border-radius: 20px;
+        border: 2px solid #333;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 240px;
+        flex-shrink: 0;
+        height: 280px;
     }
 
     .cardImage {
@@ -654,12 +662,22 @@
         gap: 12px;
         overflow-x: auto;
         overflow-y: hidden;
+        align-items: center;
     }
 
     .destinationCard {
-        width: 200px;
-        height: 100%;
+        background: white;
+        border-radius: 20px;
+        border: 2px solid #333;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 240px;
         flex-shrink: 0;
+        height: 280px;
     }
 
     .cardImage {
