@@ -1,0 +1,297 @@
+.container {
+    min-height: 100vh;
+    max-height: 100vh;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+    padding-bottom: 40px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.loading,
+.error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.1rem;
+    color: #666;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.section {
+    margin-bottom: 24px;
+}
+
+.sectionTitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 정보 카드 */
+.infoCard {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.infoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.infoItem:last-child {
+    border-bottom: none;
+}
+
+.infoLabel {
+    font-size: 0.95rem;
+    color: #666;
+    font-weight: 500;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.infoValue {
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 600;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    word-break: break-all;
+}
+
+/* 설정 버튼 */
+.settingButton {
+    background: white;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: left;
+    width: 100%;
+}
+
+.settingButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.settingButton:active {
+    transform: translateY(0);
+}
+
+.settingIcon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.settingContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.settingTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.settingDescription {
+    font-size: 0.85rem;
+    color: #999;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.settingArrow {
+    font-size: 1.2rem;
+    color: #ccc;
+    flex-shrink: 0;
+}
+
+/* 편집 카드 */
+.editCard {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.editInput {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: border-color 0.3s ease;
+}
+
+.editInput:focus {
+    outline: none;
+    border-color: #00FFAA;
+}
+
+.editButtons {
+    display: flex;
+    gap: 12px;
+}
+
+.saveButton {
+    flex: 1;
+    background: linear-gradient(135deg, #00FFAA, #00e699);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.saveButton:hover {
+    background: linear-gradient(135deg, #00e699, #00d68a);
+    transform: translateY(-2px);
+}
+
+.cancelButton {
+    flex: 1;
+    background: white;
+    color: #666;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cancelButton:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+/* 삭제 버튼 */
+.deleteButton {
+    width: 100%;
+    background: linear-gradient(135deg, #ff6b6b, #ff5252);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    margin-bottom: 12px;
+}
+
+.deleteButton:hover {
+    background: linear-gradient(135deg, #ff5252, #ff4444);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+}
+
+.deleteButton:active {
+    transform: translateY(0);
+}
+
+.deleteButton:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.warningText {
+    font-size: 0.85rem;
+    color: #ff6b6b;
+    text-align: center;
+    margin: 0;
+    font-family: 'Gamja Flower', 'Gaegu', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .content {
+        padding: 16px;
+    }
+
+    .sectionTitle {
+        font-size: 1.1rem;
+    }
+
+    .infoLabel,
+    .infoValue {
+        font-size: 0.9rem;
+    }
+
+    .settingTitle {
+        font-size: 0.95rem;
+    }
+
+    .settingDescription {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .content {
+        padding: 12px;
+    }
+
+    .section {
+        margin-bottom: 20px;
+    }
+
+    .infoCard,
+    .settingButton,
+    .deleteButton,
+    .editCard {
+        border-radius: 10px;
+    }
+
+    .settingButton {
+        padding: 14px;
+    }
+
+    .settingIcon {
+        font-size: 1.5rem;
+    }
+
+    .editButtons {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+

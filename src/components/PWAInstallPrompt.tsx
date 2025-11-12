@@ -15,8 +15,18 @@ const PWAInstallPrompt: React.FC = () => {
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
     const [isInstalled, setIsInstalled] = useState(false);
     const [isDismissing, setIsDismissing] = useState(false);
+    const [isMobile, setIsMobile] = useState(true);
 
     useEffect(() => {
+        // 모바일 디바이스인지 확인
+        const checkIfMobile = () => {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(userAgent);
+            setIsMobile(isMobileDevice);
+        };
+
+        checkIfMobile();
+
         // PWA가 이미 설치되어 있는지 확인
         const checkIfInstalled = () => {
             if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -62,8 +72,7 @@ const PWAInstallPrompt: React.FC = () => {
             if (typeof window !== 'undefined') {
                 const dismissed = localStorage.getItem('pwa-install-dismissed');
                 if (!dismissed && !isInstalled) {
-                    // beforeinstallprompt 이벤트가 이미 발생했는지 확인
-                    // 없다면 일반 설치 안내로 표시 (수동 설치 방법 안내)
+                    // 항상 프롬프트 표시 (모바일 다운로드 유도)
                     setShowInstallPrompt(true);
                 }
             }
@@ -145,22 +154,42 @@ const PWAInstallPrompt: React.FC = () => {
             <div className={styles.installContent}>
                 <div className={styles.installIcon}>📱</div>
                 <div className={styles.installText}>
-                    <h3>ODDIYA 앱 설치</h3>
-                    <p>홈 화면에 추가하여 더 빠르게 접근하세요!</p>
+                    {isMobile ? (
+                        <>
+                            <h3>ODDIYA 앱 설치</h3>
+                            <p>홈 화면에 추가하여 더 빠르게 접근하세요!</p>
+                        </>
+                    ) : (
+                        <>
+                            <h3>🚨 모바일 전용 앱입니다</h3>
+                            <p>ODDIYA는 모바일 기기에 최적화되어 있습니다.<br/>모바일 기기에서 접속하여 앱을 설치해주세요!</p>
+                        </>
+                    )}
                 </div>
                 <div className={styles.installButtons}>
-                    <button
-                        className={styles.installButton}
-                        onClick={handleInstallClick}
-                    >
-                        설치
-                    </button>
-                    <button
-                        className={styles.dismissButton}
-                        onClick={handleDismiss}
-                    >
-                        나중에
-                    </button>
+                    {isMobile ? (
+                        <>
+                            <button
+                                className={styles.installButton}
+                                onClick={handleInstallClick}
+                            >
+                                설치
+                            </button>
+                            <button
+                                className={styles.dismissButton}
+                                onClick={handleDismiss}
+                            >
+                                나중에
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            className={styles.dismissButton}
+                            onClick={handleDismiss}
+                        >
+                            닫기
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

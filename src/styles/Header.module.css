@@ -41,7 +41,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
-    transition: font-size 0.3s ease;
     min-width: 0;
     word-break: keep-all;
 }

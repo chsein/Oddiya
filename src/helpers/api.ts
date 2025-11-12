@@ -685,3 +685,41 @@ export const deletePhoto = async (
         throw error;
     }
 };
+
+// 여행 삭제 API
+export const deleteTrip = async (tripId: string): Promise<void> => {
+    try {
+        await apiClient.delete(`/api/v1/trips/${tripId}`);
+        console.log('🚗 여행 삭제 성공:', tripId);
+    } catch (error) {
+        console.error('Error deleting trip:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
+
+// 여행 수정 요청 타입
+export interface UpdateTripRequest {
+    tripName?: string;
+    destinationCity?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+// 여행 수정 API
+export const updateTrip = async (tripId: string, tripData: UpdateTripRequest): Promise<Trip> => {
+    try {
+        const response: AxiosResponse<{ success: boolean; data: Trip; message: string; timestamp: string }> =
+            await apiClient.patch(`/api/v1/trips/${tripId}`, tripData);
+        console.log('🚗 여행 수정 성공:', response.data);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error updating trip:', error);
+        if (axios.isAxiosError(error)) {
+            throw new Error(`API Error: ${error.response?.status} - ${error.message}`);
+        }
+        throw error;
+    }
+};
