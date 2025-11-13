@@ -63,8 +63,8 @@ const Home: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>ODDIYA - 나만의 스티커로 특별한 영상 만들기</title>
-        <meta name="description" content="AI가 만든 스티커로 영상을 더욱 재미있게 꾸며보세요" />
+        <title>ODDIYA</title>
+        <meta name="description" content="AI로 일정을 짜고 여행 영상을 만들어보세요" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1"
