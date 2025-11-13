@@ -70,7 +70,7 @@ const VideoList: NextPage = () => {
             try {
                 const statusResponse = await getVideoStatus(safeTripId, videoId);
 
-                console.log(`📊 진행률 업데이트: videoId=${videoId}, progress=${statusResponse.progress}%, status=${statusResponse.status}`);
+                // console.log(`📊 진행률 업데이트: videoId=${videoId}, progress=${statusResponse.progress}%, status=${statusResponse.status}`);
 
                 // 진행률 업데이트
                 setRenderingProgress(prev => ({

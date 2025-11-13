@@ -207,7 +207,7 @@ const apiClient = axios.create({
 // 요청 인터셉터 - Firebase ID Token 자동 추가
 apiClient.interceptors.request.use(
     async (config) => {
-        console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+        // console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
 
         try {
             // Firebase ID Token 가져오기
@@ -216,7 +216,7 @@ apiClient.interceptors.request.use(
             if (idToken) {
                 // Authorization 헤더에 Bearer 토큰 추가
                 config.headers.Authorization = `Bearer ${idToken}`;
-                console.log('✅ Firebase ID Token added to request');
+                //console.log('✅ Firebase ID Token added to request');
             } else {
                 console.warn('⚠️ No Firebase ID Token available - user may not be logged in');
             }

@@ -163,7 +163,7 @@
 }
 
 .menuTitle {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     font-weight: 300;
     color: #333;
     margin: 0 0 8px 0;
@@ -232,7 +232,7 @@
         gap: 16px;
         width: 100%;
         padding: 0 8px;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     }
 
     .menuImage {
@@ -241,7 +241,7 @@
     }
 
     .menuTitle {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
     }
 
     .menuDescription {
@@ -289,7 +289,7 @@
     }
 
     .menuTitle {
-        font-size: 1.4rem;
+        font-size: 0.9rem;
     }
 
     .menuDescription {
@@ -338,7 +338,7 @@
     }
 
     .menuTitle {
-        font-size: 1.3rem;
+        font-size: 0.9rem;
     }
 
     .menuDescription {

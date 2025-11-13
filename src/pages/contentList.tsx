@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Header from "../components/Header";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useAuth } from "../contexts/AuthContext";
@@ -32,14 +32,86 @@ const ContentList: NextPage = () => {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [showEndModal, setShowEndModal] = useState(false);
+    const [initialStateLoaded, setInitialStateLoaded] = useState(false);
 
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const gridRef = useRef<HTMLDivElement | null>(null);
     const isLoadingRef = useRef(false);
+    const restoredScrollRef = useRef<number>(0);
+    const hasRestoredScrollRef = useRef<boolean>(false);
+    const savedPageRef = useRef<number>(0);
+    const shouldRestorePagesRef = useRef<boolean>(false);
 
     // tripId와 regionName을 안전하게 처리
     const safeTripId = Array.isArray(tripId) ? tripId[0] : tripId;
     const safeRegionName = Array.isArray(regionName) ? regionName[0] : regionName;
+
+    const stateStorageKey = useMemo(() => {
+        if (!safeTripId) {
+            return null;
+        }
+        return `contentListState_${safeTripId}_${safeRegionName || "all"}`;
+    }, [safeTripId, safeRegionName]);
+
+    const saveListState = useCallback(
+        (partialState: { selectedFilter?: number | null; scrollLeft?: number; page?: number }) => {
+            if (!stateStorageKey || typeof window === "undefined") {
+                return;
+            }
+            try {
+                const existingRaw = sessionStorage.getItem(stateStorageKey);
+                const existing = existingRaw ? JSON.parse(existingRaw) : {};
+                const nextState = { ...existing, ...partialState };
+                sessionStorage.setItem(stateStorageKey, JSON.stringify(nextState));
+            } catch (error) {
+                console.error("Failed to save content list state:", error);
+            }
+        },
+        [stateStorageKey]
+    );
+
+    // 최초 로드 시 이전 상태 복원
+    useEffect(() => {
+        if (typeof window === "undefined") {
+            return;
+        }
+        if (!stateStorageKey) {
+            setInitialStateLoaded(true);
+            return;
+        }
+
+        try {
+            const storedRaw = sessionStorage.getItem(stateStorageKey);
+            if (storedRaw) {
+                const stored = JSON.parse(storedRaw);
+
+                if ("selectedFilter" in stored) {
+                    const storedFilter =
+                        typeof stored.selectedFilter === "number" ? stored.selectedFilter : null;
+                    setSelectedFilter(storedFilter);
+                }
+
+                if (typeof stored.scrollLeft === "number") {
+                    restoredScrollRef.current = stored.scrollLeft;
+                }
+
+                if (typeof stored.page === "number" && stored.page > 0) {
+                    savedPageRef.current = stored.page;
+                    shouldRestorePagesRef.current = true;
+                } else {
+                    savedPageRef.current = 0;
+                    shouldRestorePagesRef.current = false;
+                }
+            } else {
+                savedPageRef.current = 0;
+                shouldRestorePagesRef.current = false;
+            }
+        } catch (error) {
+            console.error("Failed to restore content list state:", error);
+        } finally {
+            setInitialStateLoaded(true);
+        }
+    }, [stateStorageKey]);
 
     const fetchDestinations = useCallback(async (targetPage: number, reset: boolean = false) => {
         if (authLoading || !user) {
@@ -127,10 +199,14 @@ const ContentList: NextPage = () => {
 
     // 필터 또는 지역 변경 시 초기화 후 첫 페이지 로드
     useEffect(() => {
+        if (!initialStateLoaded) {
+            return;
+        }
+
         if (!authLoading && user && safeRegionName) {
             fetchDestinations(0, true);
         }
-    }, [authLoading, user, safeRegionName, selectedFilter, fetchDestinations]);
+    }, [authLoading, user, safeRegionName, selectedFilter, fetchDestinations, initialStateLoaded]);
 
     // 무한 스크롤 Intersection Observer 설정
     useEffect(() => {
@@ -270,6 +346,12 @@ const ContentList: NextPage = () => {
     // 완료 버튼 제거 - 체크박스 클릭 시 즉시 서버에 저장하므로 불필요
 
     const handleDestinationClick = (destinationId: string) => {
+        saveListState({
+            selectedFilter,
+            scrollLeft: gridRef.current ? gridRef.current.scrollLeft : 0,
+            page,
+        });
+
         router.push(`/contentDetail?tripId=${safeTripId}&destinationId=${destinationId}&regionName=${safeRegionName}`);
     };
 
@@ -319,6 +401,64 @@ const ContentList: NextPage = () => {
         return title.length > 15 ? `${title.slice(0, 15)}...` : title;
     };
 
+    const handleFilterSelect = useCallback(
+        (filterId: number | null) => {
+            setSelectedFilter(filterId);
+            saveListState({
+                selectedFilter: filterId,
+                scrollLeft: 0,
+                page: 0,
+            });
+            if (gridRef.current) {
+                gridRef.current.scrollLeft = 0;
+            }
+            savedPageRef.current = 0;
+            shouldRestorePagesRef.current = false;
+        },
+        [saveListState]
+    );
+
+    // 스크롤 위치 복원
+    useEffect(() => {
+        if (!initialStateLoaded || loading) {
+            return;
+        }
+        if (hasRestoredScrollRef.current) {
+            return;
+        }
+        if (!gridRef.current) {
+            return;
+        }
+        gridRef.current.scrollLeft = restoredScrollRef.current || 0;
+        hasRestoredScrollRef.current = true;
+    }, [initialStateLoaded, loading, destinations.length]);
+
+    // 이전에 로드했던 추가 페이지 복원
+    useEffect(() => {
+        if (!initialStateLoaded || authLoading) {
+            return;
+        }
+        if (!shouldRestorePagesRef.current) {
+            return;
+        }
+        if (isLoadingRef.current) {
+            return;
+        }
+        if (page < savedPageRef.current && hasMore) {
+            fetchDestinations(page + 1);
+        } else {
+            shouldRestorePagesRef.current = false;
+        }
+    }, [initialStateLoaded, authLoading, page, hasMore, fetchDestinations]);
+
+    // selectedFilter나 page가 변할 때 상태 저장 (사용자가 다른 경로로 이동했을 때를 대비)
+    useEffect(() => {
+        saveListState({
+            selectedFilter,
+            page,
+        });
+    }, [selectedFilter, page, saveListState]);
+
     return (
         <ProtectedRoute>
             <div>
@@ -348,7 +488,7 @@ const ContentList: NextPage = () => {
                         <div className={styles.filterContainer}>
                             <button
                                 className={`${styles.filterButton} ${selectedFilter === null ? styles.active : ''}`}
-                                onClick={() => setSelectedFilter(null)}
+                                onClick={() => handleFilterSelect(null)}
                             >
                                 전체
                             </button>
@@ -356,7 +496,7 @@ const ContentList: NextPage = () => {
                                 <button
                                     key={type.id}
                                     className={`${styles.filterButton} ${selectedFilter === type.id ? styles.active : ''}`}
-                                    onClick={() => setSelectedFilter(type.id)}
+                                    onClick={() => handleFilterSelect(type.id)}
                                 >
                                     {type.name}
                                 </button>

@@ -98,7 +98,7 @@
     gap: 20px;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 10px;
+    padding: 20px;
     scrollbar-width: thin;
     scrollbar-color: #ffd700 #f0f0f0;
     width: 100%;
@@ -135,6 +135,7 @@
     width: 240px;
     height: 280px;
     flex-shrink: 0;
+
 }
 
 .destinationCard:hover {

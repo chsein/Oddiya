@@ -79,8 +79,8 @@ const VideoGeneration: NextPage = () => {
                 }));
 
                 setPhotos(fetchedPhotos);
-                console.log('=== 서버에서 로드된 사진들 ===');
-                console.log(fetchedPhotos);
+                // console.log('=== 서버에서 로드된 사진들 ===');
+                // console.log(fetchedPhotos);
             } catch (err) {
                 console.error('Error loading photos:', err);
             }
