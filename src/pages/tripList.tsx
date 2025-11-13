@@ -164,10 +164,13 @@ const TripList: NextPage = () => {
                                             <div className={styles.cardImage}>
                                                 {(() => {
                                                     const fallback = "/defaultpic.jpg";
-                                                    const imageSrc =
-                                                        typeof trip.image === "string" && /^https?:\/\//.test(trip.image)
-                                                            ? trip.image
-                                                            : fallback;
+                                                    const primaryImage = typeof trip.coverImageUrl === "string" && trip.coverImageUrl.trim() !== ""
+                                                        ? trip.coverImageUrl
+                                                        : undefined;
+                                                    const secondaryImage = typeof trip.image === "string" && trip.image.trim() !== ""
+                                                        ? trip.image
+                                                        : undefined;
+                                                    const imageSrc = primaryImage || secondaryImage || fallback;
                                                     return (
                                                         <img
                                                             src={imageSrc}

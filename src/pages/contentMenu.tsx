@@ -48,21 +48,25 @@ const ContentMenu: NextPage = () => {
             type: 'explore',
             title: '여행지 둘러보기',
             description: '지역별 여행지 탐색',
+            imageIndex: 0,
         },
         {
             type: 'collection',
             title: '관심 여행지 모아보기',
             description: '찜한 여행지를 한눈에',
+            imageIndex: 1,
         },
         {
             type: 'schedule',
             title: '일정 생성하기',
             description: 'AI가 잡아주는 여행 일정',
+            imageIndex: 2,
         },
         {
             type: 'record',
             title: '여행 기록하기',
             description: '추억을 영상으로 남기기',
+            imageIndex: 3,
         },
     ] as const;
 
@@ -146,24 +150,35 @@ const ContentMenu: NextPage = () => {
 
                 <div className={styles.content}>
                     <div className={styles.menuGrid}>
-                        {menuItems.map((item) => (
-                            <div
-                                key={item.type}
-                                className={styles.menuItem}
-                                onClick={() => handleMenuClick(item.type)}
-                            >
-                                <div className={styles.menuImageWrapper}>
-                                    <img
-                                        src={tripData.image || '/defaultpic.jpg'}
-                                        alt={item.title}
-                                        className={styles.menuImage}
-                                    />
+                        {menuItems.map((item) => {
+                            const regionImages = Array.isArray(tripData.regionImages) ? tripData.regionImages : [];
+                            const fallbackImage =
+                                typeof tripData.coverImageUrl === 'string' && tripData.coverImageUrl.trim() !== ''
+                                    ? tripData.coverImageUrl
+                                    : (tripData.image || '/defaultpic.jpg');
+                            const candidateImage = regionImages[item.imageIndex];
+                            const hasRegionImage = typeof candidateImage === 'string' && candidateImage.trim() !== '';
+                            const imageSrc = hasRegionImage ? candidateImage : fallbackImage;
+
+                            return (
+                                <div
+                                    key={item.type}
+                                    className={styles.menuItem}
+                                    onClick={() => handleMenuClick(item.type)}
+                                >
+                                    <div className={styles.menuImageWrapper}>
+                                        <img
+                                            src={imageSrc}
+                                            alt={item.title}
+                                            className={styles.menuImage}
+                                        />
+                                    </div>
+                                    <div className={styles.menuContent}>
+                                        <div className={styles.menuTitle}>{item.title}</div>
+                                    </div>
                                 </div>
-                                <div className={styles.menuContent}>
-                                    <div className={styles.menuTitle}>{item.title}</div>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>

@@ -4,6 +4,11 @@ export default function Document() {
     return (
         <Html lang="ko">
             <Head>
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1, viewport-fit=cover"
+                />
+
                 {/* PWA Meta Tags */}
                 <meta name="application-name" content="ODDIYA" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />

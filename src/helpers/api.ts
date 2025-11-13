@@ -179,6 +179,8 @@ export interface Trip {
     startDate: string;
     endDate: string;
     image?: string;
+    coverImageUrl?: string;
+    regionImages?: string[];
     createdAt: string;
     updatedAt: string;
 }
