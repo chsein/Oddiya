@@ -43,7 +43,6 @@
 }
 
 .addPhotoButton:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     border-color: #00EEFF;
 }
@@ -164,7 +163,6 @@
 }
 
 .photoCard:hover {
-    transform: translateY(-8px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     border-color: #00EEFF;
 }
@@ -309,12 +307,12 @@
 
 .modalDeleteButton:hover {
     background: rgba(255, 55, 66, 0.98);
-    transform: translateX(-50%) translateY(-3px);
+    transform: translateX(-50%);
     box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5);
 }
 
 .modalDeleteButton:active {
-    transform: translateX(-50%) translateY(-1px);
+    transform: translateX(-50%);
 }
 
 /* 에러 메시지 스타일 */
@@ -352,7 +350,6 @@
 
 .retryButton:hover {
     background: #ff3742;
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
 }
 

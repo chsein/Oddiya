@@ -94,7 +94,6 @@
 
 .retryButton:hover {
     background: #ffd700;
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(255, 225, 53, 0.4);
 }
 
@@ -458,7 +457,6 @@
 }
 
 .moreInfoCard:hover {
-    transform: translateY(-4px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
     border-color: #FFE135;
 }
@@ -1072,7 +1070,6 @@
 }
 
 .reviewItem:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     border-color: #FFE135;
 }
@@ -1133,7 +1130,6 @@
 
 .moreImagesButton:hover {
     background: rgba(0, 0, 0, 0.95);
-    transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
     border-color: rgba(255, 255, 255, 0.4);
 }
@@ -1144,7 +1140,8 @@
     border-radius: 20px;
     width: 100%;
     max-width: 85vw;
-    max-height: 90vh;
+    height: 80%;
+    max-height: 100vh;
     overflow: hidden;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     animation: modalSlideIn 0.3s ease-out;
@@ -1161,17 +1158,21 @@
 
 .imageModalBody {
     padding: 12px 10px;
-    max-height: calc(90vh - 90px);
-    overflow: hidden;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .imageContainer {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 10px;
     margin-bottom: 10px;
-    height: 180px;
+    height: 100%;
+    width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
     padding: 5px 15px;
@@ -1217,8 +1218,6 @@
 .currentImageWrapper {
     position: relative;
     flex-shrink: 0;
-    width: 250px;
-    height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1230,8 +1229,6 @@
     height: 100%;
     object-fit: contain;
     object-position: center;
-    border-radius: 15px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     max-height: 200px;
 }
 
@@ -1266,7 +1263,7 @@
 @media (max-width: 768px) {
     .imageContainer {
         gap: 8px;
-        height: 140px;
+        height: 80%;
         padding: 5px 10px;
     }
 

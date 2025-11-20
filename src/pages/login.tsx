@@ -187,14 +187,14 @@ const Login: NextPage = () => {
                     leftImage={{ src: '/headerimg/greenLeft.png', alt: 'Login' }}
                     rightImage={{ src: '/headerimg/greenRight.png', alt: 'Login' }}
                     title="로그인 하기"
-                    leftButton={{
-                        text: "뒤로가기",
-                        onClick: handleBack
-                    }}
-                    rightButton={{
-                        text: "도움말",
-                        onClick: () => console.log('도움말 클릭')
-                    }}
+                // leftButton={{
+                //     text: "뒤로가기",
+                //     onClick: handleBack
+                // }}
+                // rightButton={{
+                //     text: "도움말",
+                //     onClick: () => console.log('도움말 클릭')
+                // }}
                 />
 
                 <div className={styles.content}>

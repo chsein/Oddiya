@@ -117,7 +117,6 @@
 }
 
 .settingButton:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
@@ -201,7 +200,6 @@
 
 .saveButton:hover {
     background: linear-gradient(135deg, #00e699, #00d68a);
-    transform: translateY(-2px);
 }
 
 .cancelButton {
@@ -242,7 +240,6 @@
 
 .deleteButton:hover {
     background: linear-gradient(135deg, #ff5252, #ff4444);
-    transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
 }
 

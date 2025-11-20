@@ -364,7 +364,6 @@
 .cancelButton:hover {
     background: #e8e8e8;
     border-color: #ccc;
-    transform: translateY(-1px);
 }
 
 .submitButton {
@@ -383,7 +382,6 @@
 }
 
 .submitButton:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     background: linear-gradient(135deg, #88d8a3 0%, #a8e6cf 100%);
 }
@@ -708,7 +706,6 @@
 
 .modalActions .cancelButton:hover {
     background: #e0e0e0;
-    transform: translateY(-2px);
 }
 
 .modalActions .confirmButton {
@@ -718,7 +715,6 @@
 }
 
 .modalActions .confirmButton:hover:not(:disabled) {
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(168, 230, 207, 0.4);
 }
 

@@ -621,12 +621,14 @@ const ContentDetail: NextPage = () => {
                                         target.nextElementSibling?.classList.remove('hidden');
                                     }}
                                 />
-                                <button
-                                    className={styles.moreImagesButton}
-                                    onClick={() => setShowImageModal(true)}
-                                >
-                                    📷 더보기
-                                </button>
+                                {destination.photos && destination.photos.length > 0 && (
+                                    <button
+                                        className={styles.moreImagesButton}
+                                        onClick={() => setShowImageModal(true)}
+                                    >
+                                        📷 더보기
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -820,7 +822,7 @@ const ContentDetail: NextPage = () => {
                                                 </span>
                                             ))}
                                         </div>
-                                        <span className={styles.reviewCount}>({destination.reviewCount}개 리뷰)</span>
+                                        <span className={styles.reviewCount}>({destination.googleRatingCount}개 리뷰)</span>
                                     </div>
                                 </div>
 
@@ -835,7 +837,7 @@ const ContentDetail: NextPage = () => {
                                                         {[...Array(5)].map((_, i) => (
                                                             <span
                                                                 key={i}
-                                                                className={i < (review.rating || 5) ? styles.starFilled : styles.starEmpty}
+                                                                className={i < (review.googleRating || 5) ? styles.starFilled : styles.starEmpty}
                                                             >
                                                                 ⭐
                                                             </span>
@@ -849,11 +851,7 @@ const ContentDetail: NextPage = () => {
                                     ) : (
                                         // 더미 리뷰 데이터 (실제 API에 리뷰 데이터가 없는 경우)
                                         [
-                                            { author: '김여행', rating: 5, content: '정말 아름다운 곳이에요! 가족과 함께 가기 좋습니다.', date: '2024.01.15' },
-                                            { author: '박관광', rating: 4, content: '사진 찍기 좋고 경치가 멋져요. 주차는 좀 어려워요.', date: '2024.01.10' },
-                                            { author: '이방문', rating: 5, content: '역사적인 의미가 있는 곳이라 더욱 특별했어요.', date: '2024.01.08' },
-                                            { author: '최탐방', rating: 4, content: '조용하고 평화로운 분위기였습니다. 추천해요!', date: '2024.01.05' },
-                                            { author: '정체험', rating: 5, content: '아이들과 함께 가서 좋은 추억을 만들었어요.', date: '2024.01.03' }
+                                            { author: '김여행', rating: 5, content: '리뷰데이터가 없습니다', date: '2024.01.15' },
                                         ].map((review, index) => (
                                             <div key={index} className={styles.reviewItem}>
                                                 <div className={styles.reviewHeader}>

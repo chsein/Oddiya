@@ -73,7 +73,6 @@
 
 .retryButton:hover {
     background: #00e699;
-    transform: translateY(-2px);
 }
 
 
@@ -126,7 +125,6 @@
 }
 
 .addTripButton:hover {
-    transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0, 255, 170, 0.4);
     background: linear-gradient(135deg, #00e699, #00d68a);
 }
@@ -184,9 +182,7 @@
     border: 2px solid rgba(82, 82, 82, 0.8);
 }
 
-.tripCard:hover {
-    transform: translateY(-5px);
-}
+.tripCard:hover {}
 
 .cardImage {
     flex: 1;

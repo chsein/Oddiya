@@ -67,7 +67,6 @@
 }
 
 .goToRecordButton:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     border-color: #00EEFF;
 }
@@ -284,7 +283,6 @@
 
 .styleOption:hover {
     border-color: #00EEFF;
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 238, 255, 0.2);
 }
 
@@ -292,7 +290,6 @@
     border-color: #00EEFF;
     background: linear-gradient(135deg, #00EEFF, #0099CC);
     color: white;
-    transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 238, 255, 0.3);
 }
 
@@ -415,7 +412,6 @@
 }
 
 .musicOption:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-color: #00EEFF;
 }
@@ -477,7 +473,6 @@
 }
 
 .generateButton:hover {
-    transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     border-color: #00EEFF;
 }
@@ -570,7 +565,6 @@
 
 .retryButton:hover,
 .saveButton:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
@@ -601,7 +595,6 @@
 
 .downloadButton:hover,
 .regenerateButton:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
@@ -676,7 +669,6 @@
 
 .cancelButton:hover {
     background: #f8f9fa;
-    transform: translateY(-1px);
 }
 
 .confirmButton {
@@ -685,7 +677,6 @@
 }
 
 .confirmButton:hover {
-    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
 }
 

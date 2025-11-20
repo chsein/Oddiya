@@ -38,7 +38,6 @@
 
 .retryButton:hover {
     background: #ffd700;
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(255, 225, 53, 0.4);
 }
 
@@ -88,20 +87,22 @@
 
 .exploreButton:hover {
     background: #ff5520;
-    transform: translateY(-2px);
     box-shadow: 0 10px 24px rgba(255, 107, 53, 0.35);
 }
 
 .destinationGrid {
+    height: 80%;
     display: flex;
     flex-direction: row;
+    align-items: center;
     gap: 20px;
     overflow-x: auto;
     overflow-y: hidden;
     padding: 20px;
     scrollbar-width: thin;
-    scrollbar-color: #ffd700 #f0f0f0;
+    scrollbar-color: #FFD700 #f0f0f0;
     width: 100%;
+    flex: 1;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -139,7 +140,6 @@
 }
 
 .destinationCard:hover {
-    transform: translateY(-8px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
     border-color: #FFE135;
 }

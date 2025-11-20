@@ -104,7 +104,6 @@
 }
 
 .retryButton:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-color: #00EEFF;
 }
@@ -152,13 +151,11 @@
 }
 
 .videoCard:hover {
-    transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     border-color: #00EEFF;
 }
 
 .videoCard:active {
-    transform: translateY(-2px);
 }
 
 .videoThumbnail {
