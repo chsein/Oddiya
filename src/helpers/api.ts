@@ -556,7 +556,9 @@ export const generateItinerary = async (tripId: string, placeIds: string[]): Pro
             placeIds,
             requestBody
         });
-        const response = await apiClient.post(`/api/v1/trips/${tripId}/generate-itinerary`, requestBody);
+        const response = await apiClient.post(`/api/v1/trips/${tripId}/generate-itinerary`, requestBody, {
+            timeout: 120000  // 120초 (AI 일정 생성은 시간이 오래 걸림)
+        });
         console.log('🚗 일정 생성 성공:', response.data);
         return response.data;
     } catch (error) {
